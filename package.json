@@ -1,0 +1,31 @@
+{
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "chart.js": "^4.5.1",
+    "tailwindcss": "^4.1.18"
+  },
+  "name": "osas-sis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "devDependencies": {
+    "vite": "^7.3.1",
+    "vite-plugin-full-reload": "^1.2.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markjordanugtongspc/OSAS-SIS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/markjordanugtongspc/OSAS-SIS/issues"
+  },
+  "homepage": "https://github.com/markjordanugtongspc/OSAS-SIS#readme"
+}

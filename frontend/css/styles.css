@@ -1,0 +1,237 @@
+@import "tailwindcss";
+
+@keyframes slide-in-right {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-out {
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes progress {
+    from {
+        width: 0%;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+@keyframes spin-slow {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes shrink {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}
+
+.animate-slide-in-right {
+    animation: slide-in-right 0.3s ease-out forwards;
+}
+
+.animate-fade-out {
+    animation: fade-out 0.3s ease-in forwards;
+}
+
+.animate-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-progress {
+    animation: progress 3.5s ease-out forwards;
+}
+
+.animate-spin-slow {
+    animation: spin-slow 4s linear infinite;
+}
+
+.animate-shrink {
+    animation: shrink 5s linear forwards;
+}
+
+/* --- Borrow / Item Management Global Styles --- */
+
+/* shadcn/ui inspired styles */
+.card {
+    @apply bg-white rounded-lg border-2 border-slate-200 shadow-sm;
+}
+
+.card-hover {
+    @apply transition-all duration-200;
+}
+
+.card-hover:hover {
+    @apply shadow-lg border-slate-400;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Badge styles */
+.badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset;
+}
+
+/* Status badges */
+.status-pending {
+    @apply bg-yellow-50 text-yellow-700 ring-yellow-600/20;
+}
+
+.status-approved {
+    @apply bg-emerald-50 text-emerald-700 ring-emerald-600/20;
+}
+
+.status-returned {
+    @apply bg-blue-50 text-blue-700 ring-blue-600/20;
+}
+
+.status-overdue {
+    @apply bg-red-50 text-red-700 ring-red-600/20;
+}
+
+.status-rejected {
+    @apply bg-red-50 text-red-700 ring-red-600/20;
+}
+
+/* Table styles */
+.table-container {
+    @apply overflow-x-auto rounded-lg border border-slate-200;
+}
+
+.os-table {
+    @apply min-w-full divide-y divide-slate-200;
+}
+
+.os-thead {
+    @apply bg-slate-50;
+}
+
+.os-th {
+    @apply px-4 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider;
+}
+
+.os-td {
+    @apply px-4 py-4 text-sm text-slate-900;
+}
+
+.os-tr {
+    @apply transition-colors;
+}
+
+.os-tr:hover {
+    @apply bg-slate-50;
+}
+
+/* Dropdown menu styles */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    display: none !important;
+    /* Ensure hidden by default */
+    position: absolute;
+    right: 0;
+    top: 100%;
+    min-width: 160px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    margin-top: 0.25rem;
+}
+
+.dropdown-menu.show {
+    display: block !important;
+    /* Only visible when explicitly toggled */
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f5f9;
+}
+
+.dropdown-item:first-child {
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.dropdown-item:last-child {
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+/* Row highlight when saved to history */
+.saved-to-history {
+    background-color: #ecfdf5 !important;
+    /* emerald-50 */
+    transition: background-color 0.5s ease;
+}
+
+/* Overdue row highlight */
+.overdue-row {
+    background-color: #fef2f2 !important;
+    /* red-50 */
+}
