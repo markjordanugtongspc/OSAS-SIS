@@ -76,7 +76,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Sport Inventory & Cabinet Management System</title>
+    <link rel="icon" type="image/png" href="frontend/images/spc.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <title>Login | Sports Equipment Management Storage Management System</title>
     <?= vite(['backend/js/main.js', 'frontend/css/styles.css']) ?>
 </head>
 <body class="h-full bg-white font-sans antialiased">
@@ -119,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="h-full flex">
         
         <!-- Left Side - Maroon Panel with Background -->
-        <div class="hidden lg:flex lg:flex-1 items-center justify-center p-12 relative overflow-hidden">
+        <div id="leftPanel" class="hidden lg:flex lg:flex-1 items-center justify-center p-12 relative overflow-hidden transition-transform duration-1000 ease-in-out z-10">
             <!-- Background Image -->
             <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('frontend/images/DSA.jpg');"></div>
             
@@ -134,13 +138,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="w-48 h-48 rounded-full bg-white mx-auto mb-8 drop-shadow-2xl overflow-hidden flex items-center justify-center">
                     <img src="frontend/images/spc.png" alt="St. Peter's College Logo" class="w-full h-full object-cover">
                 </div>
-                <h1 class="text-4xl font-bold text-white mb-4 tracking-tight">St. Peter's College</h1>
-                <p class="text-lg text-white/80 font-light">Sport Inventory System &amp; Cabinet Management System</p>
+                <h1 class="text-5xl font-bold text-white mb-1 tracking-wide font-old-english">St. Peter's College</h1>
+                <h2 class="text-sm text-white/70 font-medium mb-8 tracking-[0.2em] uppercase">Office of the Student Affairs and Services</h2>
+                <div class="flex flex-col items-center gap-1">
+                    <!-- Sports Equipment -->
+                    <div class="flex items-center justify-center gap-2 text-white/50 text-sm font-medium tracking-wider uppercase">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                            <path fill-rule="evenodd" d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 00-.584.859 6.753 6.753 0 006.138 5.6 6.73 6.73 0 002.743 1.346A6.707 6.707 0 019.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 00-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 00.75-.75 2.25 2.25 0 00-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 01-1.112-3.173 6.73 6.73 0 002.743-1.347 6.753 6.753 0 006.139-5.6.75.75 0 00-.585-.858 47.077 47.077 0 00-3.07-.543V2.62a.75.75 0 00-.658-.744 49.22 49.22 0 00-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 00-.657.744zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 013.16 5.337a45.6 45.6 0 012.006-.343v.256zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 01-2.863 3.207 6.72 6.72 0 00.857-3.294z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Sports Equipment Management</span>
+                    </div>
+                    <div class="flex items-center justify-center gap-2 mt-1 text-white/50 text-sm font-medium tracking-wider uppercase">
+                        <!-- Storage/Archive Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                            <path d="M3.375 3C2.339 3 1.5 3.84 1.5 4.875v.75c0 1.036.84 1.875 1.875 1.875h17.25c1.035 0 1.875-.84 1.875-1.875v-.75C22.5 3.839 21.66 3 20.625 3H3.375z" />
+                            <path fill-rule="evenodd" d="M3.087 9l.54 9.176A3 3 0 006.62 21h10.757a3 3 0 002.995-2.824L20.913 9H3.087zm6.163 3.75A.75.75 0 0110 12h4a.75.75 0 010 1.5h-4a.75.75 0 01-.75-.75z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Storage Management System</span>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Right Side - White Login Form -->
-        <div class="flex-1 flex items-center justify-center p-8 sm:p-12">
+        <div id="rightPanel" class="flex-1 flex items-center justify-center p-8 sm:p-12 transition-transform duration-1000 ease-in-out z-10 bg-white">
             <div class="w-full max-w-md">
                 
                 <!-- Mobile Logo -->
@@ -148,8 +169,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="w-24 h-24 rounded-full bg-white mx-auto mb-4 drop-shadow-lg overflow-hidden flex items-center justify-center">
                         <img src="frontend/images/spc.png" alt="St. Peter's College Logo" class="w-full h-full object-cover">
                     </div>
-                    <h2 class="text-2xl font-bold text-[#800020]">St. Peter's College</h2>
-                    <p class="text-sm text-gray-600 mt-1">Sport Inventory System &amp; Cabinet Management System</p>
+                    <h2 class="text-3xl font-bold text-[#800020] font-old-english mb-1">St. Peter's College</h2>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.15em] mb-4">Office of the Student Affairs and Services</h3>
+                    <div class="flex flex-col items-center gap-1">
+                        <!-- Sports Equipment -->
+                        <div class="flex items-center justify-center gap-1.5 text-gray-500 text-xs uppercase tracking-wide">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5">
+                                <path fill-rule="evenodd" d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 00-.584.859 6.753 6.753 0 006.138 5.6 6.73 6.73 0 002.743 1.346A6.707 6.707 0 019.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 00-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 00.75-.75 2.25 2.25 0 00-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 01-1.112-3.173 6.73 6.73 0 002.743-1.347 6.753 6.753 0 006.139-5.6.75.75 0 00-.585-.858 47.077 47.077 0 00-3.07-.543V2.62a.75.75 0 00-.658-.744 49.22 49.22 0 00-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 00-.657.744zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 013.16 5.337a45.6 45.6 0 012.006-.343v.256zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 01-2.863 3.207 6.72 6.72 0 00.857-3.294z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Sports Equipment Management</span>
+                        </div>
+                        <div class="flex items-center justify-center gap-1.5 mt-0.5 text-gray-500 text-xs uppercase tracking-wide">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5">
+                                <path d="M3.375 3C2.339 3 1.5 3.84 1.5 4.875v.75c0 1.036.84 1.875 1.875 1.875h17.25c1.035 0 1.875-.84 1.875-1.875v-.75C22.5 3.839 21.66 3 20.625 3H3.375z" />
+                                <path fill-rule="evenodd" d="M3.087 9l.54 9.176A3 3 0 006.62 21h10.757a3 3 0 002.995-2.824L20.913 9H3.087zm6.163 3.75A.75.75 0 0110 12h4a.75.75 0 010 1.5h-4a.75.75 0 01-.75-.75z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Storage Management System</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div>
@@ -250,6 +287,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <style>
         /* Modern UI adjustments */
+        .font-old-english {
+            font-family: 'UnifrakturMaguntia', cursive;
+        }
     </style>
 
     <script>
@@ -281,10 +321,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 loadingModal.classList.remove('hidden');
                 loadingModal.classList.add('flex');
                 
-                // Redirect to dashboard after animation completes (3.8 seconds)
+                // Animation sequence
                 setTimeout(function() {
-                    window.location.href = 'frontend/pages/dashboard.php';
-                }, 3800);
+                    // 1. Fade out the loading modal
+                    loadingModal.classList.add('transition-opacity', 'duration-500', 'opacity-0');
+                    
+                    // 2. Trigger the "Main Doors Opening" animation
+                    const leftPanel = document.getElementById('leftPanel');
+                    const rightPanel = document.getElementById('rightPanel');
+                    
+                    if (leftPanel) leftPanel.classList.add('-translate-x-full');
+                    if (rightPanel) rightPanel.classList.add('translate-x-full');
+
+                    // 3. Redirect to dashboard after animation completes
+                    setTimeout(function() {
+                        window.location.href = 'frontend/pages/dashboard.php';
+                    }, 800); // Wait for the slide to complete (slightly less than duration to feel snappy)
+                    
+                }, 3200); // Start opening sequence
             }
         });
     </script>

@@ -18,6 +18,7 @@ $isDev = !file_exists(__DIR__ . '/../../dist/backend/js/pages/dashboard.js');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../images/spc.png">
     <title>Document Management - DSA Project</title>
     
     <!-- Load Styles -->
@@ -29,6 +30,18 @@ $isDev = !file_exists(__DIR__ . '/../../dist/backend/js/pages/dashboard.js');
             import('/@vite/client').catch(err => console.error('Vite client error:', err));
         </script>
     <?php endif; ?>
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- Iconify -->
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        .hover-card { transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .hover-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1); }
+    </style>
  </head>
 <body class="bg-gray-50 min-h-screen">
     
@@ -45,7 +58,7 @@ $isDev = !file_exists(__DIR__ . '/../../dist/backend/js/pages/dashboard.js');
         <header class="bg-white shadow-sm border-b border-gray-200">
                 <div class="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4">
                     <!-- Page Title -->
-                    <h2 class="text-xl font-semibold text-gray-800">Document Management Dashboard</h2>
+                    <h2 class="text-xl font-semibold text-gray-800">Storage Management Dashboard</h2>
                     
                     <!-- Right Side Actions -->
                     <div class="flex items-center gap-4">
@@ -62,149 +75,77 @@ $isDev = !file_exists(__DIR__ . '/../../dist/backend/js/pages/dashboard.js');
         
         <!-- Main Content -->
         <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-gray-50">
-                <!-- Stats Cards -->
+                <!-- Stats Cards (CMS Style) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <!-- Total Documents Card -->
-                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-[#800020]">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-600">Total Documents</p>
-                                <p class="text-2xl font-bold text-gray-900 mt-1" id="totalDocuments">0</p>
+                    <!-- Total Items Card -->
+                    <div class="hover-card bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 h-full w-1 bg-[#800000]"></div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="p-3 bg-red-50 rounded-xl text-[#800000] group-hover:scale-110 transition-transform">
+                                <span class="iconify w-6 h-6" data-icon="solar:folder-with-files-bold"></span>
                             </div>
-                            <div class="w-12 h-12 bg-[#800020]/10 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-[#800020]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                            </div>
+                            <span class="text-[10px] font-bold text-[#800000] bg-red-50 px-2 py-1 rounded-md text-right">TOTAL SUPPLIES/EQUIPMENT</span>
                         </div>
-                        <p class="text-xs text-emerald-600 mt-2">+12% from last month</p>
+                        <p class="text-3xl font-extrabold text-slate-800" id="totalDocuments">0</p>
+                        <p class="text-sm text-slate-400 font-medium mt-1">Stored Items</p>
                     </div>
                     
                     <!-- Total Cabinets Card -->
-                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-amber-500/80">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-600">Total Cabinets</p>
-                                <p class="text-2xl font-bold text-gray-900 mt-1" id="totalCabinets">0</p>
+                     <div class="hover-card bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 h-full w-1 bg-[#800000] opacity-60"></div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="p-3 bg-red-50 rounded-xl text-[#800000]/80 group-hover:scale-110 transition-transform">
+                                <span class="iconify w-6 h-6" data-icon="solar:archive-bold"></span>
                             </div>
-                            <div class="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                            </div>
+                            <span class="text-xs font-bold text-[#800000]/80 bg-red-50 px-2 py-1 rounded-md">CABINETS</span>
                         </div>
-                        <p class="text-xs text-emerald-600 mt-2">+8% from last month</p>
+                        <p class="text-3xl font-extrabold text-slate-800" id="totalCabinets">0</p>
+                        <p class="text-sm text-slate-400 font-medium mt-1">Storage Units</p>
                     </div>
                     
-                    <!-- Pending Documents Card -->
-                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-amber-500/80">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-600">Pending Review</p>
-                                <p class="text-2xl font-bold text-gray-900 mt-1" id="pendingCabinets">0</p>
+                    <!-- Pending Review Card -->
+                     <div class="hover-card bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 h-full w-1 bg-amber-500"></div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="p-3 bg-amber-50 rounded-xl text-amber-500 group-hover:scale-110 transition-transform">
+                                <span class="iconify w-6 h-6" data-icon="solar:clock-circle-bold"></span>
                             </div>
-                            <div class="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
+                            <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md">PENDING</span>
                         </div>
-                        <p class="text-xs text-orange-600 mt-2">Requires attention</p>
+                        <p class="text-3xl font-extrabold text-slate-800" id="pendingCabinets">0</p>
+                        <p class="text-sm text-slate-400 font-medium mt-1">Awaiting Action</p>
                     </div>
                     
-                    <!-- Archived Documents Card -->
-                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-slate-400/80">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-600">Archived</p>
-                                <p class="text-2xl font-bold text-gray-900 mt-1" id="archivedFiles">0</p>
+                    <!-- Archived Card -->
+                     <div class="hover-card bg-white rounded-2xl p-6 shadow-sm border border-slate-100 relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 h-full w-1 bg-slate-400"></div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="p-3 bg-slate-100 rounded-xl text-slate-500 group-hover:scale-110 transition-transform">
+                                <span class="iconify w-6 h-6" data-icon="solar:box-bold"></span>
                             </div>
-                            <div class="w-12 h-12 bg-slate-500/5 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
-                                </svg>
-                            </div>
+                            <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-md">ARCHIVED</span>
                         </div>
-                        <p class="text-xs text-gray-500 mt-2">Stored documents</p>
+                        <p class="text-3xl font-extrabold text-slate-800" id="archivedFiles">0</p>
+                        <p class="text-sm text-slate-400 font-medium mt-1">History</p>
                     </div>
                 </div>
                 
-                <!-- Charts Section -->
+                <!-- Charts Section (Dynamic ApexCharts) -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    <!-- Documents vs Papers Pie Chart -->
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Documents vs Papers Distribution</h3>
-                        <div class="h-64 flex items-center justify-center">
-                            <!-- Pie Chart Placeholder -->
-                            <div class="relative w-48 h-48">
-                                <!-- Pie Chart SVG -->
-                                <svg class="transform -rotate-90 w-full h-full" viewBox="0 0 100 100" id="pieChartSvg">
-                                    <!-- Documents -->
-                                    <circle id="pieChartDocumentsCircle" cx="50" cy="50" r="40" fill="none" stroke="#800020" stroke-width="20" 
-                                            stroke-dasharray="0 0" stroke-dashoffset="0" />
-                                    <!-- Others -->
-                                    <circle id="pieChartOthersCircle" cx="50" cy="50" r="40" fill="none" stroke="#fbbf24" stroke-width="20" 
-                                            stroke-dasharray="0 0" stroke-dashoffset="0" />
-                                </svg>
-                                <!-- Center Text -->
-                                <div class="absolute inset-0 flex items-center justify-center">
-                                    <div class="text-center">
-                                        <p class="text-2xl font-bold text-gray-800" id="pieChartTotal">0</p>
-                                        <p class="text-xs text-gray-600">Total Items</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Legend -->
-                        <div class="flex justify-center gap-6 mt-4 flex-wrap">
-                            <div class="flex items-center gap-2">
-                                <div class="w-4 h-4 rounded-full bg-[#800020]"></div>
-                                <span class="text-sm text-gray-700"><span id="pieChartDocumentsLabel">Documents</span> (<span id="pieChartDocumentsPercent">0</span>%)</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <div class="w-4 h-4 rounded-full bg-[#fbbf24]"></div>
-                                <span class="text-sm text-gray-700"><span id="pieChartOthersLabel">Others</span> (<span id="pieChartOthersPercent">0</span>%)</span>
-                            </div>
-                        </div>
+                    <!-- Distribution Chart (Bar) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 hover-card">
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">Item Distribution</h3>
+                        <p class="text-sm text-slate-500 mb-6">Breakdown by category</p>
+                        <!-- Added inline style to guarantee height if tailwind fails -->
+                        <div id="chart-distribution" style="height: 320px; width: 100%;"></div>
                     </div>
                     
-                    <!-- Document Statistics Chart -->
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Document Statistics</h3>
-                        <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-                            <div class="w-full space-y-4">
-                                <!-- Bar Chart Representation -->
-                                <div class="space-y-3">
-                                    <div>
-                                        <div class="flex justify-between text-sm text-gray-600 mb-1">
-                                            <span>Available</span>
-                                            <span id="barChartAvailableCount">0</span>
-                                        </div>
-                                        <div class="w-full bg-gray-200 rounded-full h-4">
-                                            <div id="barChartAvailableBar" class="bg-[#800020] h-4 rounded-full" style="width: 0%"></div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="flex justify-between text-sm text-gray-600 mb-1">
-                                            <span>Borrowed</span>
-                                            <span id="barChartBorrowedCount">0</span>
-                                        </div>
-                                        <div class="w-full bg-gray-200 rounded-full h-4">
-                                            <div id="barChartBorrowedBar" class="bg-amber-500 h-4 rounded-full" style="width: 0%"></div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="flex justify-between text-sm text-gray-600 mb-1">
-                                            <span>Archived</span>
-                                            <span id="barChartArchivedCount">0</span>
-                                        </div>
-                                        <div class="w-full bg-gray-200 rounded-full h-4">
-                                            <div id="barChartArchivedBar" class="bg-slate-400 h-4 rounded-full" style="width: 0%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Status Chart (Donut) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 hover-card">
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">Storage Status</h3>
+                        <p class="text-sm text-slate-500 mb-6">Current active status of items</p>
+                         <!-- Removed flex, added inline style -->
+                        <div id="chart-status" style="height: 320px; width: 100%;"></div>
                     </div>
                 </div>
                 
@@ -246,7 +187,7 @@ $isDev = !file_exists(__DIR__ . '/../../dist/backend/js/pages/dashboard.js');
     <?php if ($isDev): ?>
         <!-- Load your JavaScript entry point -->
         <script type="module">
-            import { initDashboard } from '/OSAS-SIS/backend/CMS/js/pages/dashboard.js';
+            import { initDashboard } from '/OSAS-SIS/backend/CMS/js/pages/dashboard.js?v=<?= time() ?>';
             window.initCMSDashboard = initDashboard;
             initDashboard();
         </script>

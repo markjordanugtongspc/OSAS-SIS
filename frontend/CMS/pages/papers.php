@@ -21,6 +21,7 @@ $isDev = !file_exists(__DIR__ . '/../../../dist/backend/js/pages/papers.js');
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <link rel="icon" type="image/png" href="../../images/spc.png">
     <title>Cabinets - DSA Project (v2.0)</title>
 
     <!-- Load Styles (keep global styles only; curtain styles scoped below) -->
@@ -84,6 +85,11 @@ $isDev = !file_exists(__DIR__ . '/../../../dist/backend/js/pages/papers.js');
         .cabinet-container { box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); }
         .cabinet-container .cabinet-body { padding-top: 3.6rem; }
         .cabinet-container:hover .cabinet-curtain { transform: translateY(-2px); transition: transform 180ms ease; }
+        
+        /* Drag and Drop Helpers */
+        .cabinet-card { user-select: none; -webkit-user-select: none; }
+        .sortable-fallback { opacity: 1 !important; transform: scale(1.02); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        .sortable-ghost { opacity: 0.4; }
     </style>
     
     <!-- Iconify -->
@@ -91,6 +97,10 @@ $isDev = !file_exists(__DIR__ . '/../../../dist/backend/js/pages/papers.js');
     
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- SortableJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+
     
     <?php if ($isDev): ?>
         <!-- Vite HMR Client - Must be loaded first for auto-refresh -->
@@ -114,7 +124,7 @@ $isDev = !file_exists(__DIR__ . '/../../../dist/backend/js/pages/papers.js');
         <header id="mainHeader" class="bg-transparent shadow-sm border-b border-gray-200">
                 <div class="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4">
                     <!-- Page Title -->
-                    <h2 class="text-xl font-semibold text-gray-800">Cabinets Management</h2>
+                    <h2 class="text-xl font-semibold text-gray-800">Storage Management</h2>
                     
                     <!-- Right Side Actions -->
                     <div class="flex items-center gap-4">
@@ -140,6 +150,10 @@ $isDev = !file_exists(__DIR__ . '/../../../dist/backend/js/pages/papers.js');
                             <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
+                            <!-- Search Suggestions Dropdown -->
+                            <div id="searchSuggestions" class="hidden absolute top-full left-0 right-0 mt-2 bg-[#1e1e1e] rounded-lg shadow-xl border border-gray-700 overflow-hidden z-50">
+                                <!-- Suggestions will be populated here -->
+                            </div>
                         </div>
                         
                         <!-- Filter Buttons -->
@@ -353,7 +367,7 @@ $isDev = !file_exists(__DIR__ . '/../../../dist/backend/js/pages/papers.js');
     <?php if ($isDev): ?>
         <!-- Load your JavaScript entry point -->
         <script type="module">
-            import { initPapers } from '/OSAS-SIS/backend/CMS/js/pages/papers.js';
+            import { initPapers } from '/OSAS-SIS/backend/CMS/js/pages/papers.js?v=<?php echo time(); ?>';
             window.initCMSPapers = initPapers;
             initPapers();
         </script>

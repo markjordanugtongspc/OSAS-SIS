@@ -15,28 +15,31 @@ $position = htmlspecialchars($_SESSION['position']);
 
 // Fetch borrow statistics
 try {
+    $today = date('Y-m-d');
+
     // Total borrows
     $stmt = $pdo->query("SELECT COUNT(*) as total FROM borrow_lists WHERE deleted_at IS NULL");
     $total_borrows = $stmt->fetch()['total'] ?? 0;
     
-    // Active borrows (Pending or Approved)
-    $stmt = $pdo->query("SELECT COUNT(*) as total FROM borrow_lists WHERE borrow_status IN ('Pending', 'Approved') AND deleted_at IS NULL");
-    $active_borrows = $stmt->fetch()['total'] ?? 0;
-    
-    // Completed borrows
-    $stmt = $pdo->query("SELECT COUNT(*) as total FROM borrow_lists WHERE borrow_status = 'Returned' AND deleted_at IS NULL");
-    $completed_borrows = $stmt->fetch()['total'] ?? 0;
-    
-    // Overdue borrows (past due date and not returned)
-    $stmt = $pdo->query("SELECT COUNT(*) as total FROM borrow_lists WHERE due_date < CURDATE() AND borrow_status != 'Returned' AND deleted_at IS NULL");
+    // Overdue borrows (Any status except Returned, where due_date < today)
+    // We use the PHP $today variable to ensure consistency with the frontend/PHP logic
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM borrow_lists WHERE due_date < ? AND borrow_status != 'Returned' AND deleted_at IS NULL");
+    $stmt->execute([$today]);
     $overdue_borrows = $stmt->fetch()['total'] ?? 0;
     
-    // Pending approval
-    $stmt = $pdo->query("SELECT COUNT(*) as total FROM borrow_lists WHERE borrow_status = 'Pending' AND deleted_at IS NULL");
+    // Active borrows (Pending or Approved) - strictly those NOT overdue
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM borrow_lists WHERE borrow_status IN ('Pending', 'Approved') AND due_date >= ? AND deleted_at IS NULL");
+    $stmt->execute([$today]);
+    $active_borrows = $stmt->fetch()['total'] ?? 0;
+    
+    // Pending approval (Not overdue)
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM borrow_lists WHERE borrow_status = 'Pending' AND due_date >= ? AND deleted_at IS NULL");
+    $stmt->execute([$today]);
     $pending_approval = $stmt->fetch()['total'] ?? 0;
     
-    // Approved borrows
-    $stmt = $pdo->query("SELECT COUNT(*) as total FROM borrow_lists WHERE borrow_status = 'Approved' AND deleted_at IS NULL");
+    // Approved borrows (Not overdue)
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM borrow_lists WHERE borrow_status = 'Approved' AND due_date >= ? AND deleted_at IS NULL");
+    $stmt->execute([$today]);
     $approved_borrows = $stmt->fetch()['total'] ?? 0;
     
     // Rejected borrows
@@ -47,7 +50,8 @@ try {
     $stmt = $pdo->query("SELECT COUNT(*) as total FROM borrow_lists WHERE borrow_status = 'Returned' AND deleted_at IS NULL");
     $returned_borrows = $stmt->fetch()['total'] ?? 0;
     
-    // Total deposit money (only for Approved borrows)
+    // Total deposit money (only for Approved borrows, regardless of overdue status, as we still hold the money)
+    // Or strictly Approved? If Overdue, we still hold it.
     $stmt = $pdo->query("SELECT SUM(deposit_money)  as total FROM borrow_lists WHERE borrow_status = 'Approved' AND deleted_at IS NULL");
     $total_deposits = $stmt->fetch()['total'] ?? 0;
     
@@ -98,6 +102,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../frontend/images/spc.png">
     <title>Borrow Management | OSAS SIS</title>
     <?= vite(['backend/js/main.js', 'frontend/css/styles.css']) ?>
     <!-- SweetAlert2 -->
@@ -153,7 +158,7 @@ try {
                     </div>
                     <div>
                         <p class="text-xs font-semibold text-slate-600 mb-1">Total</p>
-                        <h3 class="text-3xl font-bold text-slate-900 mb-1"><?= number_format($total_borrows) ?></h3>
+                        <h3 id="totalStats" class="text-3xl font-bold text-slate-900 mb-1"><?= number_format($total_borrows) ?></h3>
                         <p class="text-[10px] text-slate-500 font-medium tracking-tight">All borrowing records</p>
                     </div>
                 </div>
@@ -170,7 +175,7 @@ try {
                     </div>
                     <div>
                         <p class="text-xs font-semibold text-emerald-700 mb-1">Approved</p>
-                        <h3 class="text-3xl font-bold text-emerald-600 mb-1"><?= number_format($approved_borrows) ?></h3>
+                        <h3 id="approvedStats" class="text-3xl font-bold text-emerald-600 mb-1"><?= number_format($approved_borrows) ?></h3>
                         <p class="text-[10px] text-emerald-600/70 font-medium tracking-tight">Active requests</p>
                     </div>
                 </div>
@@ -188,7 +193,7 @@ try {
                     </div>
                     <div>
                         <p class="text-xs font-semibold text-orange-700 mb-1">Rejected</p>
-                        <h3 class="text-3xl font-bold text-orange-600 mb-1"><?= number_format($rejected_borrows) ?></h3>
+                        <h3 id="rejectedStats" class="text-3xl font-bold text-orange-600 mb-1"><?= number_format($rejected_borrows) ?></h3>
                         <p class="text-[10px] text-orange-600/70 font-medium tracking-tight">Denied access</p>
                     </div>
                 </div>
@@ -205,7 +210,7 @@ try {
                     </div>
                     <div>
                         <p class="text-xs font-semibold text-blue-700 mb-1">Returned</p>
-                        <h3 class="text-3xl font-bold text-blue-600 mb-1"><?= number_format($returned_borrows) ?></h3>
+                        <h3 id="returnedStats" class="text-3xl font-bold text-blue-600 mb-1"><?= number_format($returned_borrows) ?></h3>
                         <p class="text-[10px] text-blue-600/70 font-medium tracking-tight">Safe return</p>
                     </div>
                 </div>
@@ -223,7 +228,7 @@ try {
                     </div>
                     <div>
                         <p class="text-xs font-semibold text-red-700 mb-1">Overdue</p>
-                        <h3 class="text-3xl font-bold text-red-600 mb-1"><?= number_format($overdue_borrows) ?></h3>
+                        <h3 id="overdueStats" class="text-3xl font-bold text-red-600 mb-1"><?= number_format($overdue_borrows) ?></h3>
                         <p class="text-[10px] text-red-600/70 font-medium tracking-tight">Past due date</p>
                     </div>
                 </div>
@@ -240,7 +245,7 @@ try {
                     </div>
                     <div>
                         <p class="text-xs font-semibold text-purple-700 mb-1">Deposits</p>
-                        <h3 class="text-2xl font-bold text-purple-600 mb-1">₱<?= number_format($total_deposits, 2) ?></h3>
+                        <h3 id="depositStats" class="text-2xl font-bold text-purple-600 mb-1">₱<?= number_format($total_deposits, 2) ?></h3>
                         <p class="text-[10px] text-purple-600/70 font-medium tracking-tight">Held approved funds</p>
                     </div>
                 </div>
@@ -279,9 +284,15 @@ try {
 
             <!-- Borrow Records Table -->
             <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm animate-in" style="animation-delay: 0.2s">
-                <div class="p-4 border-b border-gray-200">
-                    <h3 class="text-sm font-semibold text-gray-900">Borrow Records</h3>
-                    <p class="text-xs text-gray-500 mt-1">View and manage all borrowing transactions</p>
+                <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-900">Borrow Records</h3>
+                        <p class="text-xs text-gray-500 mt-1">View and manage all borrowing transactions</p>
+                    </div>
+                    <button onclick="saveAllRecords()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-sm hover:shadow-md cursor-pointer">
+                        <span class="iconify w-3.5 h-3.5" data-icon="solar:bookmark-circle-bold"></span>
+                        Save All Records
+                    </button>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -319,7 +330,7 @@ try {
                                 <?php foreach ($borrow_records as $record): 
                                     // Determine overdue based on due date and non-returned status
                                     $dueDateObj = new DateTime($record['due_date']);
-                                    $todayObj = new DateTime();
+                                    $todayObj = new DateTime('today'); // Use 'today' to reset time to 00:00:00
                                     $isOverdue = $dueDateObj < $todayObj && $record['borrow_status'] !== 'Returned';
                                 ?>
                                     <tr class="hover:bg-gray-50/50 transition-colors duration-150 <?= $isOverdue ? 'overdue-row' : '' ?>" data-id="<?= $record['id'] ?>" data-status="<?= $record['borrow_status'] ?>" data-borrower="<?= htmlspecialchars($record['borrower_name']) ?>" data-item="<?= htmlspecialchars($record['item_name']) ?>">
@@ -398,18 +409,18 @@ try {
                                                     $badgeClass = 'bg-red-50 text-red-700 ring-1 ring-red-600/20';
                                                 }
                                             ?>
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium <?= $badgeClass ?>">
+                                            <span class="status-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium <?= $badgeClass ?>">
                                                 <?= $statusIcon ?>
                                                 <span><?= htmlspecialchars($statusLabel) ?></span>
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4">
+                                        <td class="px-6 py-4 released-by-cell">
                                             <span class="text-sm text-gray-600"><?= htmlspecialchars($record['release_by'] ?? 'N/A') ?></span>
                                         </td>
                                         <td class="px-6 py-4">
                                             <div class="flex items-center justify-center gap-1">
                                                 <!-- View Button -->
-                                                <button onclick='viewBorrowDetails(<?= json_encode($record) ?>)' class="p-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-all duration-200 group cursor-pointer" title="View Details">
+                                                <button onclick="viewBorrowDetails(<?= $record['id'] ?>)" class="p-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-all duration-200 group cursor-pointer" title="View Details">
                                                     <span class="iconify w-4.5 h-4.5" data-icon="solar:eye-bold" data-inline="false"></span>
                                                 </button>
 
@@ -650,6 +661,7 @@ try {
                                     <option value="College of Art and Sciences">College of Art and Sciences</option>
                                     <option value="College of Business Administration">College of Business Administration</option>
                                     <option value="Basic Education">Basic Education</option>
+                                    <option value="Others">Others</option>
                                 </select>
                             </div>
 
@@ -856,7 +868,7 @@ try {
             
             const currentYear = new Date().getFullYear();
             const startYear = currentYear - 1; // Show from last year
-            const endYear = currentYear + 1; // To next year
+            const endYear = currentYear + 4; // To next 4 years (added 3 more years as requested)
             
             for (let i = startYear; i <= endYear; i++) {
                 const sy = `${i}-${i + 1}`;
@@ -1036,13 +1048,39 @@ try {
         };
 
         // View borrow details
-        window.viewBorrowDetails = function(record) {
+        window.viewBorrowDetails = async function(id) {
             const modal = document.getElementById('detailsModal');
             const content = document.getElementById('detailsContent');
             
-            const statusClass = window.getStatusClass(record);
-            
+            // Show loading state
             content.innerHTML = `
+                <div class="flex items-center justify-center py-12">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#800020]"></div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'get_details');
+                formData.append('id', id);
+
+                const response = await fetch('../../backend/borrow/process_borrow.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (!data.success) {
+                    content.innerHTML = `<p class="text-center text-red-500 p-4">${data.message || 'Error loading details'}</p>`;
+                    return;
+                }
+
+                const record = data.data;
+                const statusClass = window.getStatusClass(record);
+                
+                content.innerHTML = `
                 <div class="space-y-4">
                     <div class="flex items-center justify-between pb-3 border-b border-slate-200">
                         <span class="text-sm font-medium text-slate-600">Request ID</span>
@@ -1120,6 +1158,12 @@ try {
                                 <span class="text-sm text-slate-600">Status:</span>
                                 <span class="badge ${statusClass}">${record.borrow_status}</span>
                             </div>
+                            ${record.return_status ? `
+                            <div class="flex justify-between">
+                                <span class="text-sm text-slate-600">Return Condition:</span>
+                                <span class="text-sm font-medium text-slate-900">${record.return_status}</span>
+                            </div>
+                            ` : ''}
                             ${parseFloat(record.penalty || 0) > 0 ? `
                             <div class="flex justify-between">
                                 <span class="text-sm text-slate-600">Penalty:</span>
@@ -1138,10 +1182,10 @@ try {
                         </div>
                     </div>
                 </div>
-            `;
-            
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Lock body scroll
+                `;
+            } catch (error) {
+                 content.innerHTML = `<p class="text-center text-red-500 p-4">Error loading details</p>`;
+            }
         };
 
         window.getStatusClass = function(record) {
@@ -1152,48 +1196,7 @@ try {
             return 'status-pending';
         };
 
-        // Approve borrow
-        window.approveBorrow = async function(id) {
-            closeDropdownById(id);
-            const result = await Swal.fire({
-                title: 'Approve Borrow Request?',
-                text: 'This will mark the request as approved',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#800020',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, approve it',
-                cancelButtonText: 'Cancel'
-            });
 
-            if (result.isConfirmed) {
-                const formData = new FormData();
-                formData.append('action', 'approve');
-                formData.append('id', id);
-                formData.append('release_by', '<?= $firstname . " " . $lastname ?>');
-
-                try {
-                    const response = await fetch('../../backend/borrow/process_borrow.php', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Approved!',
-                            text: 'Borrow request has been approved',
-                            confirmButtonColor: '#800020'
-                        }).then(() => location.reload());
-                    } else {
-                        Swal.fire({ icon: 'error', title: 'Error', text: data.message, confirmButtonColor: '#800020' });
-                    }
-                } catch (error) {
-                    Swal.fire({ icon: 'error', title: 'Error', text: 'An error occurred', confirmButtonColor: '#800020' });
-                }
-            }
-        };
 
         // Save to History animation - smooth add-to-cart style
         window.saveToHistory = function(id) {
@@ -1309,26 +1312,7 @@ try {
             requestAnimationFrame(animate);
         };
 
-        // Helper to update stats cards dynamically
-        window.refreshStatsCards = async function() {
-            try {
-                // We could fetch new stats via a small endpoint, but for now we'll just reload the parts we need
-                // or just let the main functions handle it. Since we are in a PHP file, 
-                // the simplest SPA way is to fetch the page content and just replace the stats grid.
-                const response = await fetch(window.location.href);
-                const html = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                
-                const newStats = doc.querySelector('.grid-cols-6');
-                const currentStats = document.querySelector('.grid-cols-6');
-                if (newStats && currentStats) {
-                    currentStats.innerHTML = newStats.innerHTML;
-                }
-            } catch (error) {
-                console.error("Error refreshing stats:", error);
-            }
-        };
+
 
         // Approve borrow
         window.approveBorrow = async function(id) {
@@ -1348,6 +1332,7 @@ try {
                 const formData = new FormData();
                 formData.append('action', 'approve');
                 formData.append('id', id);
+                formData.append('release_by', '<?= $firstname . " " . $lastname ?>');
 
                 try {
                     const response = await fetch('../../backend/borrow/process_borrow.php', {
@@ -1370,11 +1355,20 @@ try {
                         const row = document.querySelector(`#borrowTable tr[data-id="${id}"]`);
                         if (row) {
                             row.setAttribute('data-status', 'Approved');
-                            const badge = row.querySelector('.badge') || row.querySelector('span.inline-flex');
+                            
+                            // Update status badge
+                            const badge = row.querySelector('.status-badge');
                             if (badge) {
-                                badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20';
+                                badge.className = 'status-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20';
                                 badge.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><polyline points="20 6 9 17 4 12"/></svg> <span>Approved</span>';
                             }
+                            
+                            // Update Released By
+                            const releasedByCell = row.querySelector('.released-by-cell span');
+                            if (releasedByCell) {
+                                releasedByCell.textContent = '<?= $firstname . " " . $lastname ?>';
+                            }
+
                             window.refreshStatsCards();
                         }
                     } else {
@@ -1426,9 +1420,9 @@ try {
                         const row = document.querySelector(`#borrowTable tr[data-id="${id}"]`);
                         if (row) {
                             row.setAttribute('data-status', 'Rejected');
-                            const badge = row.querySelector('.badge') || row.querySelector('span.inline-flex');
+                            const badge = row.querySelector('.status-badge');
                             if (badge) {
-                                badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 ring-1 ring-red-600/20';
+                                badge.className = 'status-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 ring-1 ring-red-600/20';
                                 badge.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> <span>Rejected</span>';
                             }
                             window.refreshStatsCards();
@@ -1526,9 +1520,9 @@ try {
                     const row = document.querySelector(`#borrowTable tr[data-id="${borrowId}"]`);
                     if (row) {
                         row.setAttribute('data-status', 'Returned');
-                        const badge = row.querySelector('.badge') || row.querySelector('span.inline-flex');
+                        const badge = row.querySelector('.status-badge');
                         if (badge) {
-                            badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 ring-1 ring-blue-600/20';
+                            badge.className = 'status-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 ring-1 ring-blue-600/20';
                             badge.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><circle cx="12" cy="12" r="10"/><polyline points="16 8 11 13 8 10"/></svg> <span>Returned</span>';
                         }
                         window.refreshStatsCards();
@@ -1541,12 +1535,85 @@ try {
             }
         };
 
+        // Save All Records
+        window.saveAllRecords = async function() {
+            const rows = document.querySelectorAll('#borrowTable tbody tr');
+            if (rows.length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'No Records',
+                    text: 'There are no records to save.',
+                    confirmButtonColor: '#800020'
+                });
+                return;
+            }
+
+            const result = await Swal.fire({
+                title: 'Save All Records?',
+                text: `Are you sure you want to save all ${rows.length} records to history?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, save all',
+                cancelButtonText: 'Cancel'
+            });
+
+            if (result.isConfirmed) {
+                // Show loading state
+                Swal.fire({
+                    title: 'Saving Records...',
+                    text: 'Please wait while we save all records.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                try {
+                    const formData = new FormData();
+                    formData.append('action', 'save_all_history');
+
+                    const response = await fetch('../../backend/borrow/process_borrow.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Saved!',
+                            text: `${data.count} records have been saved to history.`,
+                            confirmButtonColor: '#800020',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+
+                        // Optionally, disable save buttons on all rows or refresh table
+                        // For visual feedback, let's disable the save buttons
+                        document.querySelectorAll('.save-history-btn').forEach(btn => {
+                            btn.disabled = true;
+                            btn.classList.add('opacity-50', 'cursor-not-allowed');
+                            btn.classList.remove('hover:bg-emerald-50', 'hover:text-emerald-700');
+                        });
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Error', text: data.message, confirmButtonColor: '#800020' });
+                    }
+                } catch (error) {
+                    console.error('Error saving all records:', error);
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'An error occurred while saving records.', confirmButtonColor: '#800020' });
+                }
+            }
+        };
+
         // Delete borrow
         window.deleteBorrow = async function(id) {
             closeDropdownById(id);
             const result = await Swal.fire({
                 title: 'Delete Borrow Record?',
-                text: 'This will soft delete the record',
+                text: 'This will permanently delete the record',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
@@ -1571,7 +1638,7 @@ try {
                         Swal.fire({
                             icon: 'success',
                             title: 'Deleted',
-                            text: 'Borrow record has been deleted',
+                            text: 'Borrow record has been permanently deleted',
                             confirmButtonColor: '#800020',
                             timer: 1500,
                             showConfirmButton: false
@@ -1597,6 +1664,7 @@ try {
             }
         };
 
+        // Filter functions
         // Filter functions
         window.applyFilters = function() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
@@ -1624,6 +1692,47 @@ try {
                     row.style.display = 'none';
                 }
             });
+        };
+
+        // Fetch and update stats cards
+        window.refreshStatsCards = async function() {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'get_stats');
+                
+                const response = await fetch('../../backend/borrow/process_borrow.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    const data = result.data;
+                    
+                    // Helper to animate numbers
+                    const animateValue = (id, start, end, prefix = '') => {
+                        const obj = document.getElementById(id);
+                        if (!obj) return;
+                        
+                        // Simply set for now to avoid complexity, or implement basic animation
+                        if (prefix === '₱') {
+                            obj.textContent = prefix + parseFloat(end).toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        } else {
+                            obj.textContent = parseInt(end).toLocaleString();
+                        }
+                    };
+                    
+                    animateValue('totalStats', 0, data.total);
+                    animateValue('approvedStats', 0, data.approved);
+                    animateValue('rejectedStats', 0, data.rejected);
+                    animateValue('returnedStats', 0, data.returned);
+                    animateValue('overdueStats', 0, data.overdue);
+                    animateValue('depositStats', 0, data.deposits, '₱');
+                }
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
         };
 
         window.resetFilters = function() {

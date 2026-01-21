@@ -22,9 +22,9 @@ try {
     $pdo->exec("set names utf8");
 
 } catch(PDOException $e) {
-    // If this is being called from a CMS API endpoint, return JSON instead of HTML
+    // If this is being called from a CMS API endpoint or Notifications API, return JSON instead of HTML
     $requestUri = $_SERVER['REQUEST_URI'] ?? '';
-    if (strpos($requestUri, '/backend/CMS/api/') !== false) {
+    if (strpos($requestUri, '/backend/CMS/api/') !== false || strpos($requestUri, '/backend/notifications/') !== false) {
         header('Content-Type: application/json');
         http_response_code(500);
 

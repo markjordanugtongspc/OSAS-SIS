@@ -93,6 +93,7 @@ foreach ($category_rows as $row) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../frontend/images/spc.png">
     <title>Dashboard | OSAS SIS</title>
     <?= vite(['backend/js/main.js', 'frontend/css/styles.css']) ?>
     <!-- ApexCharts -->

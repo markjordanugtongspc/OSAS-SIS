@@ -69,7 +69,7 @@ try {
     // Fetch saved history with pagination
     $stmt = $pdo->prepare("
         SELECT bl.*, i.item_name, i.category, i.image, i.semester AS item_semester,
-               rl.penalty AS penalty
+               rl.penalty AS penalty, rl.item_status AS return_status
         FROM user_history_saved uhs
         INNER JOIN borrow_lists bl ON uhs.borrow_list_id = bl.id
         LEFT JOIN items i ON bl.item_id = i.id 
@@ -99,6 +99,8 @@ try {
         LIMIT 20
     ");
     $recentHistory = $recentStmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 } catch (PDOException $e) {
     $savedRecord = null;
     $recentHistory = [];
@@ -110,6 +112,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../frontend/images/spc.png">
     <title>History | OSAS SIS</title>
     <?= vite(['backend/js/main.js', 'frontend/css/styles.css']) ?>
     <!-- SweetAlert2 -->
@@ -305,6 +308,8 @@ try {
                 </div>
             <?php endif; ?>
 
+            <!-- Inventory Logs Section Removed (Moved to dedicated Logs page) -->
+
         </div>
     </div>
 
@@ -482,6 +487,11 @@ try {
                                         <p class="text-xs text-slate-500 mb-0.5">Due Date:
                                             <span class="font-semibold text-slate-900">${dueDate}</span>
                                         </p>
+                                        ${record.return_status ? `
+                                        <p class="text-xs text-slate-500 mb-0.5">Return Condition: 
+                                            <span class="font-semibold text-slate-900">${record.return_status}</span>
+                                        </p>
+                                        ` : ''}
                                         <p class="text-xs text-slate-500 mb-0.5">Penalty: 
                                             <span class="font-semibold ${parseFloat(record.penalty || 0) > 0 ? 'text-red-600' : 'text-slate-900'}">
                                                 ${parseFloat(record.penalty || 0) > 0 ? '₱' + parseFloat(record.penalty).toFixed(2) : 'none'}

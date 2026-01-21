@@ -30,8 +30,8 @@
                 <img src="<?= $base_path ?>images/spc.png" alt="SPC Logo" class="w-full h-full object-cover">
             </div>
             <div class="sidebar-text">
-                <h1 class="text-lg font-bold text-white whitespace-nowrap">DSA - OSAS</h1>
-                <p class="text-xs text-white/70 whitespace-nowrap">Student Affairs</p>
+                <h1 class="text-lg font-bold text-white whitespace-nowrap">SPC - OSAS</h1>
+                <p class="text-[10px] text-white/70 whitespace-nowrap">Student Affairs and Services</p>
             </div>
         </div>
         
@@ -46,20 +46,22 @@
     <!-- Navigation Links -->
     <nav class="flex-1 px-3 py-3 space-y-1 overflow-y-hidden">
         
+
+        
         <!-- SIS Dropdown -->
         <div class="nav-group">
             <!-- Section Label (visible only when collapsed) -->
-            <div class="section-label hidden text-[9px] text-white/50 text-center py-1 mb-1 uppercase tracking-wider font-semibold">SIS</div>
+            <div class="section-label hidden text-[9px] text-white/50 text-center py-1 mb-1 uppercase tracking-wider font-semibold">Sports</div>
             <button class="nav-dropdown-trigger nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all group relative w-full" data-dropdown="sis-dropdown">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 flex-shrink-0">
                     <path fill-rule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0118 9.375v9.375a3 3 0 003-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 00-.673-.05A3 3 0 0015 1.5h-1.5a3 3 0 00-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6zM13.5 3A1.5 1.5 0 0012 4.5h4.5A1.5 1.5 0 0015 3h-1.5z" clip-rule="evenodd" />
                     <path fill-rule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 013 20.625V9.375z" clip-rule="evenodd" />
                 </svg>
-                <span class="sidebar-text text-sm whitespace-nowrap flex-1 text-left">Sport Inventory System</span>
+                <span class="sidebar-text text-sm whitespace-nowrap flex-1 text-left truncate">Sports Equipment</span>
                 <svg class="dropdown-arrow sidebar-text w-4 h-4 transition-transform duration-300 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
-                <span class="tooltip">Sport Inventory System</span>
+                <span class="tooltip">Sports Equipment Management</span>
             </button>
             <div id="sis-dropdown" class="dropdown-content overflow-hidden transition-all duration-300 max-h-0 opacity-0">
                 <a href="<?= $base_path ?>pages/dashboard.php" class="nav-item nav-subitem flex items-center gap-2.5 px-3 py-2 ml-6 rounded-lg <?= $current_page == 'dashboard.php' && $current_dir == 'pages' ? 'bg-white/10 text-white font-medium' : 'text-white/70 hover:text-white hover:bg-white/5' ?> transition-all group relative">
@@ -101,6 +103,13 @@
                     <span class="sidebar-text text-sm whitespace-nowrap">History</span>
                     <span class="tooltip">History</span>
                 </a>
+                <a href="<?= $base_path ?>pages/logs.php" id="nav-logs" class="nav-item nav-subitem flex items-center gap-2.5 px-3 py-2 ml-6 rounded-lg <?= $current_page == 'logs.php' ? 'bg-white/10 text-white font-medium' : 'text-white/70 hover:text-white hover:bg-white/5' ?> transition-all group relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5 flex-shrink-0">
+                        <path fill-rule="evenodd" d="M5.625 1.5H9a3.75 3.75 0 013.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 013.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 01-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875zM12.75 12a.75.75 0 00-1.5 0V7.5a.75.75 0 00-1.5 0v5.25a.75.75 0 001.5 0 .75.75 0 01.75.75v3.75a.75.75 0 001.5 0V12.75a.75.75 0 01-1.5 0v-6.75z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="sidebar-text text-sm whitespace-nowrap">Logs</span>
+                    <span class="tooltip">Logs</span>
+                </a>
             </div>
         </div>
 
@@ -110,13 +119,13 @@
         <!-- Document Management Dropdown -->
         <div class="nav-group">
             <!-- Section Label (visible only when collapsed) -->
-            <div class="section-label hidden text-[9px] text-white/50 text-center py-1 mb-1 uppercase tracking-wider font-semibold">Cabinet</div>
+            <div class="section-label hidden text-[9px] text-white/50 text-center py-1 mb-1 uppercase tracking-wider font-semibold">Storage</div>
             <button class="nav-dropdown-trigger nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all group relative w-full" data-dropdown="docs-dropdown">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 flex-shrink-0">
                     <path fill-rule="evenodd" d="M5.625 1.5H9a3.75 3.75 0 013.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 013.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 01-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875zm6.905 9.97a.75.75 0 00-1.06 0l-3 3a.75.75 0 101.06 1.06l1.72-1.72V18a.75.75 0 001.5 0v-4.19l1.72 1.72a.75.75 0 101.06-1.06l-3-3z" clip-rule="evenodd" />
                     <path d="M14.25 5.25a5.23 5.23 0 00-1.279-3.434 9.768 9.768 0 016.963 6.963A5.23 5.23 0 0016.5 7.5h-1.875a.375.375 0 01-.375-.375V5.25z" />
                 </svg>
-                <span class="sidebar-text text-sm whitespace-nowrap flex-1 text-left">Cabinet Management</span>
+                <span class="sidebar-text text-sm whitespace-nowrap flex-1 text-left">Storage Management</span>
                 <svg class="dropdown-arrow sidebar-text w-4 h-4 transition-transform duration-300 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
@@ -136,12 +145,28 @@
                         <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625z" />
                         <path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" />
                     </svg>
-                    <span class="sidebar-text text-sm whitespace-nowrap">Papers</span>
-                    <span class="tooltip">Papers</span>
+                    <span class="sidebar-text text-sm whitespace-nowrap">Supplies/Equipment</span>
+                    <span class="tooltip">Supplies/Equipment</span>
                 </a>
+                
+
             </div>
         </div>
 
+        <!-- Divider -->
+        <div class="nav-divider sidebar-text my-2 mx-3 border-t border-white/20"></div>
+
+        <!-- Notifications Link (Top Level) -->
+        <a href="<?= $base_path ?>notification/notification.php" id="nav-notifications" class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-lg <?= strpos($current_page, 'notification') !== false ? 'bg-white/10 text-white font-medium' : 'text-white/80 hover:text-white hover:bg-white/10' ?> transition-all group relative">
+            <div class="relative flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                    <path fill-rule="evenodd" d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9c.46.03.92.059 1.383.087a2.25 2.25 0 01-2.925 0c.462-.028.923-.057 1.383-.087zM5 4.5a3 3 0 013-3h6a3 3 0 013 3v1.5a.75.75 0 01-1.5 0v-1.5a1.5 1.5 0 00-1.5-1.5h-6a1.5 1.5 0 00-1.5 1.5v1.5a.75.75 0 01-1.5 0V4.5z" clip-rule="evenodd" />
+                </svg>
+                <span id="navNotificationBadge" class="absolute -top-1.5 -right-2.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white hidden ring-1 ring-[#800020]">0</span>
+            </div>
+            <span class="sidebar-text text-sm whitespace-nowrap">Notifications</span>
+            <span class="tooltip">Notifications</span>
+        </a>
     </nav>
 
     <!-- User Profile & Logout -->
@@ -470,6 +495,35 @@
 <script>
 // Sidebar toggle functionality & Smooth Navigation
 document.addEventListener('DOMContentLoaded', function() {
+    // --- Notification Badge Logic ---
+    async function updateNotificationBadge() {
+        try {
+            const badge = document.getElementById('navNotificationBadge');
+            if(!badge) return;
+            
+            const response = await fetch('/OSAS-SIS/backend/notifications/api.php?mode=count&t=' + new Date().getTime());
+            const result = await response.json();
+            
+            if (result.success && result.data.count > 0) {
+                badge.textContent = result.data.count > 99 ? '99+' : result.data.count;
+                badge.className = 'absolute -top-1.5 -right-2.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white ring-1 ring-[#800020]';
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        } catch (error) {
+            console.error('Failed to update notifications:', error);
+        }
+    }
+    
+    // Initial check
+    updateNotificationBadge();
+    
+    // Periodically check every 2 seconds for real-time feel
+    setInterval(updateNotificationBadge, 2000);
+    
+    // Listen for updates from other parts of the app
+    window.addEventListener('notificationsUpdated', updateNotificationBadge);
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const spaMarker = document.getElementById('spaContentMarker');
@@ -764,6 +818,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                         if (typeof window.initDashboard === 'function') {
                             window.initDashboard();
+                        }
+                        if (typeof window.initNotificationPage === 'function') {
+                            window.initNotificationPage();
                         }
                     }, 100);
 

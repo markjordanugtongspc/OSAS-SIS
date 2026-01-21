@@ -11,9 +11,11 @@ function vite($entries) {
         $entries = [$entries];
     }
 
-    // Detect base path for subfolder installations (e.g. /OSAS-SIS/)
-    $script_dir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
-    $base_url = rtrim($script_dir, '/');
+    // Detect base path relative to document root
+    // We know this file is at [ROOT]/backend/vite_helper.php, so dirname(__DIR__) is [ROOT]
+    $project_root = str_replace('\\', '/', dirname(__DIR__));
+    $doc_root = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
+    $base_url = str_replace($doc_root, '', $project_root);
 
     $is_dev = false;
     // Check if Vite dev server is running

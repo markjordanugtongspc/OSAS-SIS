@@ -14,20 +14,73 @@ $lastname = htmlspecialchars($_SESSION['lastname']);
 $position = htmlspecialchars($_SESSION['position']);
 
 // Pagination Configuration
-$limit = 5;
+$limit = 10;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($page < 1) $page = 1;
 $offset = ($page - 1) * $limit;
 
-// Fetch items with pagination
+// Search and Filter Parameters
+$search = $_GET['search'] ?? '';
+$sport_filter = $_GET['sport'] ?? '';
+$status_filter = $_GET['status'] ?? '';
+
+// Ensure 'deleted_at' column exists in items table to prevent errors on first load
 try {
+    $pdo->query("SELECT deleted_at FROM items LIMIT 1");
+} catch (PDOException $e) {
+    try {
+        $pdo->exec("ALTER TABLE items ADD COLUMN deleted_at TIMESTAMP NULL DEFAULT NULL");
+    } catch (PDOException $ex) {
+        // Continue if error
+    }
+}
+
+// Ensure 'location' column exists
+try {
+    $pdo->query("SELECT location FROM items LIMIT 1");
+} catch (PDOException $e) {
+    try {
+        $pdo->exec("ALTER TABLE items ADD COLUMN location VARCHAR(255) NULL DEFAULT NULL");
+    } catch (PDOException $ex) {
+        // Continue if error
+    }
+}
+
+// Fetch items with pagination and filters
+try {
+    // Build Query Conditions
+    $where_clauses = ["deleted_at IS NULL"];
+    $params = [];
+
+    if (!empty($search)) {
+        $where_clauses[] = "(item_name LIKE :search OR unique_id LIKE :search OR category LIKE :search OR brand LIKE :search)";
+        $params[':search'] = "%$search%";
+    }
+
+    if (!empty($sport_filter)) {
+        $where_clauses[] = "sport = :sport";
+        $params[':sport'] = $sport_filter;
+    }
+
+    if (!empty($status_filter)) {
+        $where_clauses[] = "status = :status";
+        $params[':status'] = $status_filter;
+    }
+
+    $where_sql = implode(' AND ', $where_clauses);
+
     // Get total count for pagination
-    $countStmt = $pdo->query("SELECT COUNT(*) FROM items");
+    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM items WHERE $where_sql");
+    $countStmt->execute($params);
     $total_items_count = $countStmt->fetchColumn();
     $total_pages = ceil($total_items_count / $limit);
 
     // Get paginated items
-    $stmt = $pdo->prepare("SELECT * FROM items ORDER BY id DESC LIMIT :limit OFFSET :offset");
+    $sql = "SELECT * FROM items WHERE $where_sql ORDER BY id DESC LIMIT :limit OFFSET :offset";
+    $stmt = $pdo->prepare($sql);
+    foreach ($params as $key => $val) {
+        $stmt->bindValue($key, $val);
+    }
     $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     $stmt->execute();
@@ -35,6 +88,7 @@ try {
 } catch (PDOException $e) {
     $items = [];
     $total_pages = 0;
+    // For debugging: echo $e->getMessage();
 }
 ?>
 <!DOCTYPE html>
@@ -42,6 +96,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../frontend/images/spc.png">
     <title>Item Management | OSAS SIS</title>
     <?= vite(['backend/js/main.js', 'frontend/css/styles.css']) ?>
     <!-- SweetAlert2 -->
@@ -83,6 +138,7 @@ try {
                     <input 
                         type="text" 
                         id="searchInput" 
+                        value="<?= htmlspecialchars($search) ?>"
                         placeholder="Search by item name, ID, brand, or category..."
                         class="w-full pl-10 pr-4 py-1.5 border border-[#800020] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#800020] focus:border-transparent transition-all text-sm"
                     >
@@ -98,38 +154,54 @@ try {
                         class="w-full px-4 py-1.5 border border-[#800020] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#800020] focus:border-transparent transition-all text-sm"
                     >
                         <option value="">All Sports</option>
-                        <option value="Basketball">🏀 Basketball</option>
-                        <option value="Volleyball">🏐 Volleyball</option>
-                        <option value="Badminton">🏸 Badminton</option>
-                        <option value="Table Tennis">🏓 Table Tennis</option>
-                        <option value="Tennis">🎾 Tennis</option>
-                        <option value="Football">⚽ Football</option>
-                        <option value="Baseball">⚾ Baseball</option>
-                        <option value="Swimming">🏊 Swimming</option>
-                        <option value="Athletics">🏃 Athletics</option>
-                        <option value="Others">🏅 Others</option>
+                        <option value="Basketball" <?= $sport_filter == 'Basketball' ? 'selected' : '' ?>>🏀 Basketball</option>
+                        <option value="Volleyball" <?= $sport_filter == 'Volleyball' ? 'selected' : '' ?>>🏐 Volleyball</option>
+                        <option value="Badminton" <?= $sport_filter == 'Badminton' ? 'selected' : '' ?>>🏸 Badminton</option>
+                        <option value="Table Tennis" <?= $sport_filter == 'Table Tennis' ? 'selected' : '' ?>>🏓 Table Tennis</option>
+                        <option value="Tennis" <?= $sport_filter == 'Tennis' ? 'selected' : '' ?>>🎾 Tennis</option>
+                        <option value="Football" <?= $sport_filter == 'Football' ? 'selected' : '' ?>>⚽ Football</option>
+                        <option value="Baseball" <?= $sport_filter == 'Baseball' ? 'selected' : '' ?>>⚾ Baseball</option>
+                        <option value="Swimming" <?= $sport_filter == 'Swimming' ? 'selected' : '' ?>>🏊 Swimming</option>
+                        <option value="Athletics" <?= $sport_filter == 'Athletics' ? 'selected' : '' ?>>🏃 Athletics</option>
+                        <option value="Sepak Takraw" <?= $sport_filter == 'Sepak Takraw' ? 'selected' : '' ?>>🦶 Sepak Takraw</option>
+                        <option value="Yoga" <?= $sport_filter == 'Yoga' ? 'selected' : '' ?>>🧘 Yoga</option>
+                        <option value="Others" <?= $sport_filter == 'Others' ? 'selected' : '' ?>>🏅 Others</option>
+                    </select>
+                </div>
+
+                <!-- Status Filter Dropdown -->
+                <div class="w-48">
+                    <select 
+                        id="statusFilter" 
+                        class="w-full px-4 py-1.5 border border-[#800020] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#800020] focus:border-transparent transition-all text-sm"
+                    >
+                        <option value="">All Status</option>
+                        <option value="Available" <?= $status_filter == 'Available' ? 'selected' : '' ?>>Available</option>
+                        <option value="Unavailable" <?= $status_filter == 'Unavailable' ? 'selected' : '' ?>>Unavailable</option>
+                        <option value="Damaged" <?= $status_filter == 'Damaged' ? 'selected' : '' ?>>Damaged</option>
                     </select>
                 </div>
             </div>
             
             <!-- Items Table -->
             <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-                <div class="overflow-x-auto">
+                <div class="overflow-hidden">
                     <table class="min-w-full">
                         <thead>
                             <tr class="bg-gradient-to-r from-[#800020] to-[#5c0016] text-white">
-                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">ID</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Image</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Item Details</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Sport</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Category</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Stock</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Price</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider">Actions</th>
+                                <th class="px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap w-16">No.</th>
+                                <th class="px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap">Code</th>
+                                <th class="px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap">Image</th>
+                                <th class="px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap">Item Details</th>
+                                <th class="px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap">Sport</th>
+                                <th class="px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap">Category</th>
+                                <th class="px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap">Stock</th>
+                                <th class="px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap">Price</th>
+                                <th class="px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap">Status</th>
+                                <th class="px-6 py-2 text-center text-xs font-semibold uppercase tracking-wider whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-100">
+                        <tbody id="itemsTableBody" class="bg-white divide-y divide-gray-100">
                             <?php if (empty($items)): ?>
                                 <tr>
                                     <td colspan="9" class="px-6 py-16 text-center">
@@ -145,10 +217,13 @@ try {
                             <?php else: ?>
                                 <?php foreach ($items as $item): ?>
                                     <tr class="hover:bg-gray-50/50 transition-colors duration-150">
-                                        <td class="px-6 py-4">
-                                            <span class="text-xs font-mono text-gray-600"><?= htmlspecialchars($item['unique_id']) ?></span>
+                                        <td class="px-6 py-2">
+                                            <span class="text-xs font-bold text-gray-900">#<?= htmlspecialchars($item['id']) ?></span>
                                         </td>
-                                        <td class="px-6 py-4">
+                                        <td class="px-6 py-2 whitespace-nowrap">
+                                            <span class="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded"><?= htmlspecialchars($item['unique_id']) ?></span>
+                                        </td>
+                                        <td class="px-6 py-2">
                                             <div class="relative group">
                                                 <?php 
                                                 // Check if item is new (created within 24 hours)
@@ -162,7 +237,7 @@ try {
                                                 ?>
                                                 
                                                 <?php if ($item['image']): ?>
-                                                    <div class="relative w-14 h-14">
+                                                    <div class="relative w-10 h-10">
                                                         <img src="../../frontend/images/items/<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['item_name']) ?>" class="w-full h-full rounded-lg object-cover ring-2 ring-gray-100 group-hover:ring-[#800020]/20 transition-all">
                                                         <?php if ($is_new): ?>
                                                             <div class="absolute top-0 right-0 bg-green-600 text-white text-[8px] font-semibold px-1.5 py-0.5 rounded-br-md rounded-tl-lg">
@@ -171,8 +246,8 @@ try {
                                                         <?php endif; ?>
                                                     </div>
                                                 <?php else: ?>
-                                                    <div class="relative w-14 h-14 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center ring-2 ring-gray-100">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-400">
+                                                    <div class="relative w-10 h-10 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center ring-2 ring-gray-100">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-400">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                                                         </svg>
                                                         <?php if ($is_new): ?>
@@ -184,7 +259,7 @@ try {
                                                 <?php endif; ?>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4">
+                                        <td class="px-6 py-2">
                                             <div class="flex flex-col gap-1">
                                                 <p class="text-sm font-semibold text-gray-900"><?= htmlspecialchars($item['item_name']) ?></p>
                                                 <div class="flex items-center gap-2">
@@ -200,7 +275,7 @@ try {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4">
+                                        <td class="px-6 py-2">
                                             <?php if ($item['sport']): ?>
                                                 <?php
                                                 // Color coding and emojis for sports
@@ -215,6 +290,8 @@ try {
                                                     'Baseball' => ['emoji' => '⚾', 'color' => 'bg-indigo-100 text-indigo-700 ring-indigo-600/20'],
                                                     'Swimming' => ['emoji' => '🏊', 'color' => 'bg-cyan-100 text-cyan-700 ring-cyan-600/20'],
                                                     'Athletics' => ['emoji' => '🏃', 'color' => 'bg-purple-100 text-purple-700 ring-purple-600/20'],
+                                                    'Sepak Takraw' => ['emoji' => '🦶', 'color' => 'bg-yellow-100 text-yellow-700 ring-yellow-600/20'],
+                                                    'Yoga' => ['emoji' => '🧘', 'color' => 'bg-rose-100 text-rose-700 ring-rose-600/20'],
                                                     'Others' => ['emoji' => '🏅', 'color' => 'bg-gray-100 text-gray-700 ring-gray-600/20']
                                                 ];
                                                 $sportInfo = $sportData[$sport] ?? ['emoji' => '🏅', 'color' => 'bg-gray-100 text-gray-700 ring-gray-600/20'];
@@ -227,17 +304,17 @@ try {
                                                 <span class="text-xs text-gray-400">-</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td class="px-6 py-4">
+                                        <td class="px-6 py-2 whitespace-nowrap">
                                             <span class="text-sm text-gray-700"><?= htmlspecialchars($item['category'] ?? 'Uncategorized') ?></span>
                                         </td>
-                                        <td class="px-6 py-4">
+                                        <td class="px-6 py-2 whitespace-nowrap">
                                             <span class="text-sm font-bold <?= $item['quantity'] == 0 ? 'text-red-600' : 'text-gray-900' ?>"><?= htmlspecialchars($item['quantity']) ?></span>
                                             <span class="text-xs <?= $item['quantity'] == 0 ? 'text-red-500' : 'text-gray-500' ?> ml-1">pcs</span>
                                         </td>
-                                        <td class="px-6 py-4">
+                                        <td class="px-6 py-2">
                                             <span class="text-sm font-semibold text-gray-900">₱<?= number_format($item['price'], 2) ?></span>
                                         </td>
-                                        <td class="px-6 py-4">
+                                        <td class="px-6 py-2">
                                             <?php
                                                 $statusClass = '';
                                                 $statusIcon = '';
@@ -257,7 +334,7 @@ try {
                                                 <?= htmlspecialchars($item['status']) ?>
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4">
+                                        <td class="px-6 py-2">
                                             <div class="flex items-center justify-center">
                                                 <!-- View Button -->
                                                 <button onclick='viewItem(<?= htmlspecialchars(json_encode($item)) ?>)' class="p-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-all duration-200 group cursor-pointer" title="View Details">
@@ -285,57 +362,30 @@ try {
 
             <!-- Pagination UI -->
             <?php if ($total_pages > 1): ?>
-                <div class="mt-6 flex items-center justify-between bg-white px-4 py-3 sm:px-6 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="flex flex-1 justify-between sm:hidden">
-                        <?php if ($page > 1): ?>
-                            <a href="?page=<?= $page - 1 ?>" class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</a>
-                        <?php endif; ?>
-                        <?php if ($page < $total_pages): ?>
-                            <a href="?page=<?= $page + 1 ?>" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</a>
-                        <?php endif; ?>
-                    </div>
-                    <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                        <div>
-                            <p class="text-sm text-gray-700">
-                                Showing
-                                <span class="font-medium"><?= $offset + 1 ?></span>
-                                to
-                                <span class="font-medium"><?= min($offset + $limit, $total_items_count) ?></span>
-                                of
-                                <span class="font-medium"><?= $total_items_count ?></span>
-                                results
-                            </p>
-                        </div>
-                        <div>
-                            <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                                <!-- Previous Page -->
-                                <a href="?page=<?= max(1, $page - 1) ?>" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 <?= $page <= 1 ? 'pointer-events-none opacity-50' : '' ?>">
-                                    <span class="sr-only">Previous</span>
-                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
-                                    </svg>
-                                </a>
-                                
-                                <?php
-                                $start_page = max(1, $page - 2);
-                                $end_page = min($total_pages, $page + 2);
-                                
-                                for ($i = $start_page; $i <= $end_page; $i++):
-                                ?>
-                                    <a href="?page=<?= $i ?>" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold <?= $i === $page ? 'z-10 bg-[#800020] text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#800020]' : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0' ?>">
-                                        <?= $i ?>
-                                    </a>
-                                <?php endfor; ?>
+                <div id="paginationContainer" class="mt-6 flex items-center justify-between">
+                    <!-- Results Counter (Left) -->
+                    <p class="text-sm text-gray-500">
+                        Showing <span class="font-medium text-gray-900"><?= $offset + 1 ?></span> to <span class="font-medium text-gray-900"><?= min($offset + $limit, $total_items_count) ?></span> of <span class="font-medium text-gray-900"><?= $total_items_count ?></span> items
+                    </p>
 
-                                <!-- Next Page -->
-                                <a href="?page=<?= min($total_pages, $page + 1) ?>" class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 <?= $page >= $total_pages ? 'pointer-events-none opacity-50' : '' ?>">
-                                    <span class="sr-only">Next</span>
-                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-                                    </svg>
-                                </a>
-                            </nav>
-                        </div>
+                    <!-- Navigation Controls (Right) -->
+                    <div class="flex items-center gap-4">
+                        <!-- Previous Button -->
+                        <a href="?page=<?= max(1, $page - 1) ?>&search=<?= urlencode($search) ?>&sport=<?= urlencode($sport_filter) ?>&status=<?= urlencode($status_filter) ?>" 
+                           class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 <?= $page > 1 ? 'bg-[#800020] text-white hover:bg-[#66001a]' : 'bg-gray-200 text-gray-500 pointer-events-none opacity-50' ?>">
+                            Previous
+                        </a>
+
+                        <!-- Page Indicator -->
+                        <span class="text-sm font-medium text-gray-700">
+                            <?= $page ?> / <?= $total_pages ?>
+                        </span>
+
+                        <!-- Next Button -->
+                        <a href="?page=<?= min($total_pages, $page + 1) ?>&search=<?= urlencode($search) ?>&sport=<?= urlencode($sport_filter) ?>&status=<?= urlencode($status_filter) ?>" 
+                           class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 <?= $page < $total_pages ? 'bg-[#800020] text-white hover:bg-[#66001a]' : 'bg-gray-200 text-gray-500 pointer-events-none opacity-50' ?>">
+                            Next
+                        </a>
                     </div>
                 </div>
             <?php endif; ?>
@@ -424,6 +474,14 @@ try {
                                     <div>
                                         <p class="text-[10px] font-semibold text-gray-500 mb-1 uppercase tracking-wide">SEMESTER</p>
                                         <p id="view_semester" class="text-sm font-semibold text-gray-900"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] font-semibold text-gray-500 mb-1 uppercase tracking-wide">LOCATION</p>
+                                        <p id="view_location" class="text-sm font-semibold text-gray-900"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] font-semibold text-gray-500 mb-1 uppercase tracking-wide">SCHOOL YEAR</p>
+                                        <p id="view_school_year" class="text-sm font-semibold text-gray-900"></p>
                                     </div>
                                 </div>
                             </div>
@@ -519,6 +577,8 @@ try {
                                         <option value="Table Tennis">Table Tennis</option>
                                         <option value="Athletics">Athletics</option>
                                         <option value="Chess">Chess</option>
+                                        <option value="Sepak Takraw">Sepak Takraw</option>
+                                        <option value="Yoga">Yoga</option>
                                         <option value="Others">Others</option>
                                     </select>
                                 </div>
@@ -566,6 +626,18 @@ try {
                                         <option value="2nd Semester">2nd Semester</option>
                                         <option value="Summer">Summer</option>
                                     </select>
+                                </div>
+
+                                <!-- School Year -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">School Year</label>
+                                    <input type="text" name="school_year" placeholder="e.g., 2023-2024" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#800020] focus:border-transparent">
+                                </div>
+
+                                <!-- Location -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                    <input type="text" name="location" placeholder="e.g., Cabinet A, Shelf 1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#800020] focus:border-transparent">
                                 </div>
 
                                 <!-- Description -->
@@ -661,6 +733,8 @@ try {
                                     <option value="Table Tennis">Table Tennis</option>
                                     <option value="Athletics">Athletics</option>
                                     <option value="Chess">Chess</option>
+                                    <option value="Sepak Takraw">Sepak Takraw</option>
+                                    <option value="Yoga">Yoga</option>
                                     <option value="Others">Others</option>
                                 </select>
                             </div>
@@ -698,10 +772,25 @@ try {
                                     <option value="Summer">Summer</option>
                                 </select>
                             </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-0.5">School Year</label>
+                                <input type="text" name="school_year" id="edit_school_year" placeholder="e.g., 2023-2024" class="w-full px-2.5 py-1.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-[#800020] focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-0.5">Location</label>
+                                <input type="text" name="location" id="edit_location" placeholder="e.g., Cabinet A" class="w-full px-2.5 py-1.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-[#800020] focus:border-transparent">
+                            </div>
                             
                             <div class="col-span-4">
                                 <label class="block text-xs font-medium text-gray-700 mb-0.5">Description</label>
                                 <textarea name="description" id="edit_description" rows="2" class="w-full px-2.5 py-1.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-[#800020] focus:border-transparent"></textarea>
+                            </div>
+                            
+                            <div class="col-span-4">
+                                <label class="block text-xs font-medium text-gray-700 mb-0.5">Reason for Update (Required if reducing quantity)</label>
+                                <textarea name="reason" id="edit_reason" rows="2" placeholder="e.g., Damaged, Lost, Expired, etc." class="w-full px-2.5 py-1.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-[#800020] focus:border-transparent"></textarea>
                             </div>
                             
                             <div class="col-span-4">
@@ -729,6 +818,7 @@ try {
     // Scoped variables to prevent "Identifier has already been declared" errors during SPA navigation
     const searchInput = document.getElementById('searchInput');
     const sportFilter = document.getElementById('sportFilter');
+    const statusFilter = document.getElementById('statusFilter');
     // Note: tableRows is dynamic, so we should query it inside the filter function if rows change dynamically
     // But for now we keep the logic somewhat consistent, though querySelectorAll returns a static NodeList
     // Better to query inside filterTable or use live collection if rows are added/removed often.
@@ -750,17 +840,45 @@ try {
         document.getElementById('edit_unique_id').value = item.unique_id;
         document.getElementById('edit_category').value = item.category || '';
         document.getElementById('edit_quantity').value = item.quantity;
+        document.getElementById('edit_quantity').dataset.original = item.quantity; // Store original quantity
         document.getElementById('edit_price').value = item.price;
         document.getElementById('edit_brand').value = item.brand || '';
         document.getElementById('edit_color').value = item.color || '';
         document.getElementById('edit_size').value = item.size || '';
         document.getElementById('edit_sport').value = item.sport || '';
         document.getElementById('edit_semester').value = item.semester || '';
+        document.getElementById('edit_school_year').value = item.school_year || '';
+        document.getElementById('edit_location').value = item.location || '';
         document.getElementById('edit_status').value = item.status;
-        document.getElementById('edit_description').value = item.description || '';
+        document.getElementById('editItemModal').classList.remove('hidden');
+        const reasonContainer = document.getElementById('edit_reason').parentElement;
+        document.getElementById('edit_reason').value = ''; // Reset reason
+        // Optional: Hide reason initially or check against logic? 
+        // User wants it to "show when i try to deduct". 
+        // We'll reset it to hidden unless logic dictates otherwise (which is default state)
+        // But for better UX, let's allow it to be visible if they want to update reason anyway?
+        // "make sure the reason for update will show when i try to deduct" -> Strict interpretation:
+        // Hide it by default, show if quantity < original.
+        reasonContainer.classList.add('hidden'); 
         
         document.getElementById('editItemModal').classList.remove('hidden');
     };
+
+    // Add listener to quantity input to toggle reason field
+    document.getElementById('edit_quantity').addEventListener('input', function() {
+        const originalQty = parseInt(this.dataset.original || 0);
+        const newQty = parseInt(this.value || 0);
+        const reasonContainer = document.getElementById('edit_reason').parentElement;
+        
+        if (newQty < originalQty) {
+            reasonContainer.classList.remove('hidden');
+            reasonContainer.classList.add('animate-in', 'fade-in', 'slide-in-from-top-2');
+            document.getElementById('edit_reason').setAttribute('required', 'required');
+        } else {
+            reasonContainer.classList.add('hidden');
+            document.getElementById('edit_reason').removeAttribute('required');
+        }
+    });
 
     window.closeEditModal = function() {
         document.getElementById('editItemModal').classList.add('hidden');
@@ -777,6 +895,8 @@ try {
         document.getElementById('view_size').textContent = item.size || 'Not specified';
         document.getElementById('view_sport').textContent = item.sport || 'Not specified';
         document.getElementById('view_semester').textContent = item.semester || 'Not specified';
+        document.getElementById('view_school_year').textContent = item.school_year || 'Not specified';
+        document.getElementById('view_location').textContent = item.location || 'Not specified';
         document.getElementById('view_quantity').textContent = item.quantity + ' pcs';
         document.getElementById('view_price').textContent = '₱' + parseFloat(item.price).toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('view_description').textContent = item.description || 'No description available.';
@@ -856,38 +976,63 @@ try {
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch('../../backend/items/delete_item.php', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: 'item_id=' + id
-                })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Deleted!',
-                            text: result.message || 'Item has been deleted successfully',
-                            confirmButtonColor: '#800020',
-                            timer: 2000,
-                            showConfirmButton: false
-                        }).then(() => location.reload());
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: result.message || 'Failed to delete item',
-                            confirmButtonColor: '#800020'
+                // Ask for reason
+                Swal.fire({
+                    title: 'Reason for Deletion',
+                    input: 'textarea',
+                    inputLabel: 'Please provide a reason for deleting this item',
+                    inputPlaceholder: 'Type your reason here...',
+                    inputAttributes: {
+                        'aria-label': 'Type your reason here'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Submit',
+                    confirmButtonColor: '#800020',
+                    cancelButtonColor: '#6b7280',
+                    preConfirm: (reason) => {
+                        if (!reason) {
+                            Swal.showValidationMessage('A reason is required to delete an item');
+                        }
+                        return reason;
+                    }
+                }).then((reasonResult) => {
+                    if (reasonResult.isConfirmed) {
+                        const reason = reasonResult.value;
+                        
+                        fetch('../../backend/items/delete_item.php', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                            body: 'item_id=' + id + '&reason=' + encodeURIComponent(reason)
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: result.message || 'Item has been deleted successfully',
+                                    confirmButtonColor: '#800020',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => location.reload());
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: result.message || 'Failed to delete item',
+                                    confirmButtonColor: '#800020'
+                                });
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'An error occurred while deleting the item',
+                                confirmButtonColor: '#800020'
+                            });
                         });
                     }
-                })
-                .catch(() => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'An error occurred while deleting the item',
-                        confirmButtonColor: '#800020'
-                    });
                 });
             }
         });
@@ -971,45 +1116,95 @@ try {
         }
     });
     
-    // Search and Filter Functionality
-    function filterTable() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        const selectedSport = sportFilter.value.toLowerCase().trim();
-        const rows = document.querySelectorAll('tbody tr'); // Query dynamically to avoid stale state
+    async function performSearch() {
+        // Collect current filter values
+        const search = searchInput.value.trim();
+        const sport = sportFilter.value;
+        const status = statusFilter.value;
         
-        rows.forEach(row => {
-            // Skip the "no items" row
-            if (row.querySelector('td[colspan]')) {
-                return;
+        // Construct URL
+        const url = new URL(window.location.href);
+        if (search) url.searchParams.set('search', search); 
+        else url.searchParams.delete('search');
+        
+        if (sport) url.searchParams.set('sport', sport); 
+        else url.searchParams.delete('sport');
+        
+        if (status) url.searchParams.set('status', status); 
+        else url.searchParams.delete('status');
+        
+        // Reset to page 1 for new searches
+        url.searchParams.set('page', 1);
+        
+        // Update URL without reloading (Push State)
+        window.history.pushState({}, '', url);
+
+        try {
+            // Fetch the new page content
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const html = await response.text();
+            
+            // Parse HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Extract and replace Table Body
+            const newTbody = doc.querySelector('#itemsTableBody');
+            const currentTbody = document.getElementById('itemsTableBody');
+            if (newTbody && currentTbody) {
+                currentTbody.innerHTML = newTbody.innerHTML;
+            }
+
+            // Extract and replace Pagination
+            const newPagination = doc.querySelector('#paginationContainer');
+            const currentPagination = document.getElementById('paginationContainer');
+            if (newPagination) {
+                if (currentPagination) {
+                    currentPagination.outerHTML = newPagination.outerHTML;
+                } else {
+                    // If pagination didn't exist before (e.g., 0 results), append it if new one exists
+                     const contentArea = document.querySelector('.px-8.py-8');
+                     if (contentArea) contentArea.appendChild(newPagination);
+                }
+            } else if (currentPagination) {
+                // If no pagination in new result (e.g. < 1 page), remove old one
+                currentPagination.remove();
             }
             
-            // Get all searchable text content from row
-            const uniqueId = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase() || '';
-            const itemName = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
-            const sport = row.querySelector('td:nth-child(4)')?.textContent.toLowerCase() || '';
-            const category = row.querySelector('td:nth-child(5)')?.textContent.toLowerCase() || '';
-            
-            // Check search match (unique_id, item name, category, etc.)
-            const matchesSearch = !searchTerm || 
-                uniqueId.includes(searchTerm) ||
-                itemName.includes(searchTerm) || 
-                category.includes(searchTerm);
-            
-            // Check sport filter match (exact match for better filtering)
-            const matchesSport = !selectedSport || sport.includes(selectedSport);
-            
-            // Show/hide row based on both filters
-            if (matchesSearch && matchesSport) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
+            // Re-scan icons if using Iconify
+            if (window.Iconify) {
+                window.Iconify.scan();
             }
-        });
+
+        } catch (error) {
+            console.error('Search failed:', error);
+            // Fallback to full reload if fetch fails
+            window.location.href = url.toString();
+        }
+    }
+
+    let debounceTimer;
+    function updateSearchDebounced() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(performSearch, 300); // 300ms for quicker feedback
     }
     
     // Event listeners attached to the scoped variables
-    if (searchInput) searchInput.addEventListener('input', filterTable);
-    if (sportFilter) sportFilter.addEventListener('change', filterTable);
+    if (searchInput) {
+        searchInput.addEventListener('input', updateSearchDebounced);
+        // Trigger immediately on Enter
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                clearTimeout(debounceTimer);
+                performSearch();
+            }
+        });
+    }
+
+    // For dropdowns, trigger immediately
+    if (sportFilter) sportFilter.addEventListener('change', performSearch);
+    if (statusFilter) statusFilter.addEventListener('change', performSearch);
 
 }
     </script>

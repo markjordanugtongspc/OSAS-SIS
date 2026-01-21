@@ -190,8 +190,8 @@ function initAddDocumentButton() {
             const result = await Swal.fire({
                 icon: 'info',
                 title: 'Select a Cabinet First',
-                text: 'Please navigate to the Papers page and select a cabinet where you want to add the document.',
-                confirmButtonText: 'Go to Papers',
+                text: 'Please navigate to the Supplies/Equipment page and select a cabinet where you want to add the document.',
+                confirmButtonText: 'Go to Supplies/Equipment',
                 confirmButtonColor: '#800000',
                 showCancelButton: true,
                 cancelButtonText: 'Cancel',

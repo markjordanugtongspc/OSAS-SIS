@@ -25,6 +25,8 @@ $color = htmlspecialchars(trim($_POST['color'] ?? ''));
 $size = htmlspecialchars(trim($_POST['size'] ?? ''));
 $sport = htmlspecialchars(trim($_POST['sport'] ?? ''));
 $semester = htmlspecialchars(trim($_POST['semester'] ?? ''));
+$school_year = htmlspecialchars(trim($_POST['school_year'] ?? ''));
+$location = htmlspecialchars(trim($_POST['location'] ?? ''));
 $status = htmlspecialchars(trim($_POST['status']));
 $description = htmlspecialchars(trim($_POST['description'] ?? ''));
 
@@ -52,8 +54,8 @@ if (isset($_FILES['item_image']) && $_FILES['item_image']['error'] === UPLOAD_ER
 }
 
 try {
-    $sql = "INSERT INTO items (unique_id, item_name, category, quantity, price, brand, color, size, sport, semester, status, description, image, number_has_been_uses) 
-            VALUES (:unique_id, :item_name, :category, :quantity, :price, :brand, :color, :size, :sport, :semester, :status, :description, :image, 0)";
+    $sql = "INSERT INTO items (unique_id, item_name, category, quantity, price, brand, color, size, sport, semester, school_year, location, status, description, image, number_has_been_uses) 
+            VALUES (:unique_id, :item_name, :category, :quantity, :price, :brand, :color, :size, :sport, :semester, :school_year, :location, :status, :description, :image, 0)";
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
@@ -67,11 +69,27 @@ try {
         ':size' => $size,
         ':sport' => $sport,
         ':semester' => $semester,
+        ':school_year' => $school_year,
+        ':location' => $location,
         ':status' => $status,
         ':description' => $description,
         ':image' => $image_name
     ]);
     
+    // Create Notification
+    try {
+        $notifSql = "INSERT INTO notifications (user_id, role_target, title, message, type, link, image, created_at, status) 
+                     VALUES (:user_id, 'All', 'New Item Added', :message, 'SIS', '/OSAS-SIS/frontend/pages/item_management.php', :image, NOW(), 'unread')";
+        $notifStmt = $pdo->prepare($notifSql);
+        $notifStmt->execute([
+            ':user_id' => $_SESSION['user_id'] ?? 0,
+            ':message' => "Item '{$item_name}' has been added to the inventory.",
+            ':image' => $image_name
+        ]);
+    } catch (Exception $e) {
+        // Ignore notification errors to avoid failing the main request
+    }
+
     echo json_encode(['success' => true, 'message' => 'Item added successfully']);
 } catch (PDOException $e) {
     echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);

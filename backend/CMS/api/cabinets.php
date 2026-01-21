@@ -71,7 +71,8 @@ try {
                     // Get all cabinets including archived
                     $stmt = $pdo->prepare("
                         SELECT c.*, 
-                               COUNT(DISTINCT f.id) as file_count
+                               COUNT(DISTINCT f.id) as file_count,
+                               GROUP_CONCAT(f.category SEPARATOR '|||') as categories_list
                         FROM cabinets c
                         LEFT JOIN files f ON c.id = f.cabinet_id AND f.deleted_at IS NULL
                         GROUP BY c.id
@@ -81,7 +82,8 @@ try {
                     // Get only non-archived cabinets
                     $stmt = $pdo->prepare("
                         SELECT c.*, 
-                               COUNT(DISTINCT f.id) as file_count
+                               COUNT(DISTINCT f.id) as file_count,
+                               GROUP_CONCAT(f.category SEPARATOR '|||') as categories_list
                         FROM cabinets c
                         LEFT JOIN files f ON c.id = f.cabinet_id AND f.deleted_at IS NULL
                         WHERE c.status != 'archived' OR c.status IS NULL
@@ -112,6 +114,13 @@ try {
             // Validate status
             if (!in_array($status, ['active', 'pending', 'archived'])) {
                 $status = 'active';
+            }
+
+            // Check for duplicate name (active/pending only)
+            $stmt = $pdo->prepare("SELECT id FROM cabinets WHERE name = ? AND status != 'archived'");
+            $stmt->execute([$name]);
+            if ($stmt->fetch()) {
+                sendResponse(false, null, 'A cabinet with this name already exists', 409);
             }
             
             $stmt = $pdo->prepare("

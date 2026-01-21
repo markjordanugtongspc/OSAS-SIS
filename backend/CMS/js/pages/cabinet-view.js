@@ -23,6 +23,7 @@ export function initCabinetView() {
     // Initialize all filter dropdowns
     initCabinetNumberSort();
     initCategorySort();
+    initOsasServiceSort();
     initStatusSort();
 
     // Initialize search functionality
@@ -67,8 +68,6 @@ async function loadDocumentsFromQuery() {
             } catch (error) {
                 console.error('Error fetching cabinet info:', error);
             }
-
-            // Load documents for this cabinet
             await reloadDocumentsForCabinet(numericCabinetId);
 
             // If a specific file_id is provided, highlight that file once documents are loaded
@@ -98,6 +97,41 @@ export function initDocumentManagement() {
         });
     }
 
+    const exportBtn = document.getElementById('exportTableBtn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', exportTableToPDF);
+    }
+
+    const bulkAddBtn = document.getElementById('bulkAddBtn');
+    if (bulkAddBtn) {
+        console.log('Bulk Add button found, attaching listener');
+        bulkAddBtn.addEventListener('click', () => {
+            console.log('Bulk Add button clicked');
+            try {
+                if (typeof showBulkAddModal === 'function') {
+                    showBulkAddModal();
+                } else {
+                    console.error('showBulkAddModal is not defined');
+                    // Fallback or alert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Bulk Add feature is currently unavailable (Function not found). Please refresh the page.'
+                    });
+                }
+            } catch (e) {
+                console.error('Error opening bulk add modal:', e);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while opening the modal: ' + e.message
+                });
+            }
+        });
+    } else {
+        console.warn('Bulk Add button NOT found');
+    }
+
     // Initialize document count
     updateDocumentCount();
 }
@@ -106,6 +140,7 @@ export function initDocumentManagement() {
 let currentFilters = {
     cabinetNumber: 'all',
     category: 'all',
+    osasService: 'all',
     status: 'all',
     searchTerm: ''
 };
@@ -216,6 +251,60 @@ function initCategorySort() {
 }
 
 /**
+ * Initialize OSAS Service sort dropdown functionality
+ */
+function initOsasServiceSort() {
+    const sortBtn = document.getElementById('osasServiceSortBtn');
+    const sortDropdown = document.getElementById('osasServiceSortDropdown');
+    const sortText = document.getElementById('osasServiceSortText');
+
+    if (!sortBtn || !sortDropdown) return;
+
+    // Toggle dropdown
+    sortBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sortDropdown.classList.toggle('hidden');
+
+        // Close other dropdowns
+        document.getElementById('cabinetNumberSortDropdown')?.classList.add('hidden');
+        document.getElementById('categorySortDropdown')?.classList.add('hidden');
+        document.getElementById('statusSortDropdown')?.classList.add('hidden');
+    });
+
+    // Handle service selection with event delegation
+    sortDropdown.addEventListener('click', (e) => {
+        const option = e.target.closest('button[data-osas-service]');
+        if (!option) return;
+
+        e.stopPropagation();
+        const service = option.getAttribute('data-osas-service');
+        const optionText = option.textContent.trim();
+
+        // Update button text - Truncate if too long for the button
+        if (sortText) {
+            sortText.textContent = service === 'all' ? 'All Services' : (optionText.length > 20 ? optionText.substring(0, 20) + '...' : optionText);
+        }
+
+        // Close dropdown
+        sortDropdown.classList.add('hidden');
+
+        // Update filter state
+        currentFilters.osasService = service;
+
+        // Apply all filters
+        applyAllFilters();
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (sortBtn && !sortBtn.contains(e.target) && sortDropdown && !sortDropdown.contains(e.target)) {
+            sortDropdown.classList.add('hidden');
+        }
+    });
+}
+
+
+/**
  * Initialize status sort dropdown functionality
  */
 function initStatusSort() {
@@ -233,6 +322,7 @@ function initStatusSort() {
         // Close other dropdowns
         document.getElementById('cabinetNumberSortDropdown')?.classList.add('hidden');
         document.getElementById('categorySortDropdown')?.classList.add('hidden');
+        document.getElementById('osasServiceSortDropdown')?.classList.add('hidden');
     });
 
     // Handle status selection
@@ -321,6 +411,30 @@ function applyAllFilters() {
             }
         }
 
+        // Filter by OSAS Service
+        if (isVisible && currentFilters.osasService !== 'all') {
+            const serviceCell = row.querySelector('td:nth-child(5)');
+            if (serviceCell) {
+                // Determine text content (handle div truncation wrapper if present)
+                let serviceText = serviceCell.textContent.trim();
+                const innerDiv = serviceCell.querySelector('div');
+                if (innerDiv) {
+                    serviceText = innerDiv.textContent.trim();
+                }
+
+                if (serviceText !== currentFilters.osasService && serviceText !== 'N/A') {
+                    // Check strict equality or if service is actually N/A when we wanted something else
+                    if (currentFilters.osasService === 'N/A') {
+                        if (serviceText !== 'N/A') isVisible = false;
+                    } else {
+                        if (serviceText !== currentFilters.osasService) isVisible = false;
+                    }
+                } else if (serviceText === 'N/A' && currentFilters.osasService !== 'N/A' && currentFilters.osasService !== 'all') {
+                    isVisible = false;
+                }
+            }
+        }
+
         // Filter by status
         if (isVisible && currentFilters.status !== 'all') {
             const statusCell = row.querySelector('td:nth-child(6)');
@@ -400,33 +514,33 @@ export function showAddDocumentModal() {
         html: `
             <form id="addDocumentForm" class="text-left">
                 <div class="mb-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Document Name</label>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Document Name</label>
                     <input 
                         type="text" 
                         id="documentName" 
                         name="documentName" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#800000] focus:border-[#800000] outline-none"
-                        placeholder="Enter document name"
+                        class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#800000] focus:border-[#800000] outline-none"
+                        placeholder="Enter name"
                         required
                     />
                 </div>
                 <div class="mb-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Cabinet Number</label>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Cabinet Number</label>
                     <input 
                         type="text" 
                         id="cabinetNumberInput" 
                         name="cabinetNumber" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#800000] focus:border-[#800000] outline-none"
-                        placeholder="e.g., C1.1"
+                        class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#800000] focus:border-[#800000] outline-none"
+                        placeholder="e.g. C1.1"
                         required
                     />
                 </div>
-                <div class="mb-3">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Document Category</label>
+                <div class="mb-2">
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Category</label>
                     <select 
                         id="documentCategory" 
                         name="documentCategory" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#800000] focus:border-[#800000] outline-none"
+                        class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#800000] focus:border-[#800000] outline-none"
                         required
                     >
                         <option value="">Select category</option>
@@ -435,22 +549,31 @@ export function showAddDocumentModal() {
                         <option value="Objects">Objects</option>
                     </select>
                 </div>
-                <div class="mb-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                    <textarea 
-                        id="documentDescription" 
-                        name="documentDescription" 
-                        rows="2"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#800000] focus:border-[#800000] outline-none"
-                        placeholder="Enter document description or notes"
-                    ></textarea>
+                <div class="mb-2">
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">OSAS Service</label>
+                    <select 
+                        id="osasService" 
+                        name="osasService" 
+                        class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#800000] focus:border-[#800000] outline-none"
+                    >
+                        <option value="">Select Service</option>
+                        <option value="Guidance and service counseling services">Guidance and service counseling services</option>
+                        <option value="Student Organization">Student Organization</option>
+                        <option value="Scholarship and Financial Assistance">Scholarship and Financial Assistance</option>
+                        <option value="Health Service">Health Service</option>
+                        <option value="Culture and Art Program">Culture and Art Program</option>
+                        <option value="Sports Development Program">Sports Development Program</option>
+                        <option value="Safety and Security Services">Safety and Security Services</option>
+                        <option value="Student Housing and Residential Services">Student Housing and Residential Services</option>
+                        <option value="Social and Community Involvement Programs">Social and Community Involvement Programs</option>
+                    </select>
                 </div>
                 <div class="mb-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Status</label>
                     <select 
                         id="documentStatus" 
                         name="documentStatus" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#800000] focus:border-[#800000] outline-none"
+                        class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#800000] focus:border-[#800000] outline-none"
                         required
                     >
                         <option value="available">Available</option>
@@ -476,6 +599,7 @@ export function showAddDocumentModal() {
             const name = document.getElementById('documentName')?.value;
             const cabinetNumber = document.getElementById('cabinetNumberInput')?.value;
             const category = document.getElementById('documentCategory')?.value;
+            const osasService = document.getElementById('osasService')?.value;
             const description = document.getElementById('documentDescription')?.value;
             const status = document.getElementById('documentStatus')?.value;
 
@@ -487,7 +611,10 @@ export function showAddDocumentModal() {
             return {
                 name,
                 cabinetNumber: cabinetNumber.trim(),
+                name,
+                cabinetNumber: cabinetNumber.trim(),
                 category,
+                osas_service: osasService || '',
                 description: description || '',
                 status
             };
@@ -568,6 +695,7 @@ export function showAddDocumentModal() {
                         filename: result.value.name,
                         description: result.value.description || null,
                         category: result.value.category,
+                        osas_service: result.value.osas_service,
                         status: result.value.status.toLowerCase()
                     })
                 });
@@ -769,19 +897,20 @@ export function addDocumentToTable(docData) {
         <td class="px-6 py-4 whitespace-nowrap text-center">
             <span class="text-sm text-gray-900 font-medium">${cabinetNumber}</span>
         </td>
-        <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm font-medium text-gray-900">${docData.name}</div>
-            <div class="text-sm text-gray-500">${docData.description || 'No description'}</div>
+        <td class="px-6 py-4">
+            <div class="text-sm font-medium text-gray-900" title="${docData.name}" style="max-width: 22rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${docData.name.length > 45 ? docData.name.substring(0, 45) + '...' : docData.name}
+            </div>
+            <div class="text-sm text-gray-500" title="${docData.description || ''}" style="max-width: 22rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${(docData.description || 'No description').length > 45 ? (docData.description || 'No description').substring(0, 45) + '...' : (docData.description || 'No description')}
+            </div>
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-center">
             <span class="px-2 py-1 text-xs rounded-full ${categoryBadgeClass}">${category}</span>
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-center">
-            <div class="flex items-center">
-                <div class="w-8 h-8 rounded-full bg-[#800000] flex items-center justify-center text-white font-semibold text-xs mr-2">
-                    A
-                </div>
-                <span class="text-sm text-gray-900">Admin</span>
+            <div class="text-sm text-gray-900 mx-auto" title="${docData.osas_service || 'N/A'}" style="max-width: 14rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${(docData.osas_service || 'N/A')}
             </div>
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-center">
@@ -824,9 +953,14 @@ export function addDocumentToTable(docData) {
  * @param {number} cabinetId - Cabinet ID
  * @param {string|null} status - Optional status filter (available, borrowed, archived)
  */
-async function reloadDocumentsForCabinet(cabinetId, status = null) {
+export async function reloadDocumentsForCabinet(cabinetId, status = null) {
     try {
-        let apiUrl = `/OSAS-SIS/backend/CMS/api/files.php?cabinet_id=${cabinetId}`;
+        let apiUrl;
+        if (cabinetId) {
+            apiUrl = `/OSAS-SIS/backend/CMS/api/files.php?cabinet_id=${cabinetId}`;
+        } else {
+            apiUrl = `/OSAS-SIS/backend/CMS/api/files.php?mode=all`;
+        }
 
         if (status && ['available', 'borrowed', 'archived'].includes(status)) {
             apiUrl += `&status=${encodeURIComponent(status)}`;
@@ -882,6 +1016,12 @@ async function reloadDocumentsForCabinet(cabinetId, status = null) {
 
             // Update Category filter dropdown
             populateCategoryDropdown(uniqueCategories);
+
+            // Extract unique OSAS Services from API response
+            const uniqueServices = [...new Set(result.data.map(doc => doc.osas_service).filter(Boolean))].sort();
+
+            // Update OSAS Service filter dropdown
+            populateOsasServiceDropdown(uniqueServices);
         }
     } catch (error) {
         console.error('Error reloading documents:', error);
@@ -892,7 +1032,7 @@ async function reloadDocumentsForCabinet(cabinetId, status = null) {
  * Highlight a specific file row in the documents table and scroll it into view.
  * @param {number} fileId - File ID to highlight
  */
-function highlightFileRow(fileId) {
+export function highlightFileRow(fileId) {
     const tableBody = document.getElementById('documentsTableBody');
     if (!tableBody) return;
 
@@ -984,15 +1124,21 @@ function createDocumentRowFromAPI(doc, rowNumber) {
         <td class="px-6 py-4 whitespace-nowrap text-center">
             <span class="text-sm text-gray-900 font-medium">${doc.cabinet_number}</span>
         </td>
-        <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm font-medium text-gray-900">${doc.filename}</div>
-            <div class="text-sm text-gray-500">${doc.description || 'No description'}</div>
+        <td class="px-6 py-4">
+            <div class="text-sm font-medium text-gray-900" title="${doc.filename}" style="max-width: 22rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${doc.filename.length > 45 ? doc.filename.substring(0, 45) + '...' : doc.filename}
+            </div>
+            <div class="text-sm text-gray-500" title="${doc.description || ''}" style="max-width: 22rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${(doc.description || 'No description').length > 45 ? (doc.description || 'No description').substring(0, 45) + '...' : (doc.description || 'No description')}
+            </div>
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-center">
             <span class="px-2 py-1 text-xs rounded-full ${categoryBadgeClass}">${doc.category || 'Documents'}</span>
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-center">
-            <span class="text-sm text-gray-900">${doc.added_by || 'Admin'}</span>
+            <div class="text-sm text-gray-900 mx-auto" title="${doc.osas_service || 'N/A'}" style="max-width: 14rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${(doc.osas_service || 'N/A')}
+            </div>
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-center">
             <span class="px-2 py-1 text-xs rounded-full ${statusBadgeClass}">${statusText}</span>
@@ -1068,9 +1214,55 @@ export function updateDocumentCount() {
 
     // Count visible document rows only (exclude empty state row and filtered/hidden rows)
     const rows = tableBody.querySelectorAll('tr:not(#emptyStateRow):not(.hidden)');
-    const count = rows.length;
 
-    documentCount.textContent = `${count} document${count !== 1 ? 's' : ''}`;
+    // Aggregate counts by category
+    const categoryCounts = {};
+    let totalCount = 0;
+
+    rows.forEach(row => {
+        const categoryCell = row.querySelector('td:nth-child(4)');
+        if (categoryCell) {
+            const categoryText = categoryCell.textContent.trim();
+            // Basic singular/plural handling if needed, but categories are usually nouns
+            categoryCounts[categoryText] = (categoryCounts[categoryText] || 0) + 1;
+            totalCount++;
+        }
+    });
+
+    if (totalCount === 0) {
+        documentCount.innerHTML = '<span class="text-sm">0 documents</span>';
+    } else {
+        // Create formatted HTML with icons
+        const countHtml = Object.entries(categoryCounts)
+            .map(([cat, num]) => {
+                let icon = '';
+                let badgeClass = 'bg-purple-50 px-2.5 py-1 rounded-md border border-purple-100 text-purple-700'; // Default / Documents
+
+                if (cat.toLowerCase() === 'sports') {
+                    // Trophy icon / Ball icon
+                    icon = '<svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+                    badgeClass = 'bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100 text-blue-700';
+                } else if (cat.toLowerCase() === 'objects') {
+                    // Cube icon
+                    icon = '<svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>';
+                    badgeClass = 'bg-orange-50 px-2.5 py-1 rounded-md border border-orange-100 text-orange-700';
+                } else {
+                    // Document icon
+                    icon = '<svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>';
+                }
+
+                return `
+                    <div class="flex items-center gap-1.5 ${badgeClass}">
+                        ${icon}
+                        <span class="font-medium">${num} ${cat}</span>
+                    </div>
+                `;
+            })
+            .join(''); // Remove separator since we use flex gap on container
+
+        // Wrap in flex container
+        documentCount.innerHTML = `<div class="flex items-center gap-2">${countHtml}</div>`;
+    }
 
     // Update row numbers
     updateRowNumbers();
@@ -1133,6 +1325,11 @@ async function viewDocument(fileId) {
             }
             Swal.fire({
                 title: doc.filename,
+                icon: 'info',
+                width: '520px',
+                customClass: 'swal2-doc-view-modal',
+                confirmButtonColor: '#800000',
+                confirmButtonText: 'Close',
                 html: `
                     <div class="text-left space-y-3">
                         <div>
@@ -1142,6 +1339,10 @@ async function viewDocument(fileId) {
                         <div>
                             <p class="text-sm font-semibold text-gray-700">Category:</p>
                             <p class="text-sm text-gray-900">${doc.category || 'Documents'}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-700">OSAS Service:</p>
+                            <p class="text-sm text-gray-900">${doc.osas_service || 'N/A'}</p>
                         </div>
                         <div>
                             <p class="text-sm font-semibold text-gray-700">Description:</p>
@@ -1162,10 +1363,7 @@ async function viewDocument(fileId) {
                             <p class="text-sm text-gray-900">${doc.added_by || 'Admin'}</p>
                         </div>
                     </div>
-                `,
-                icon: 'info',
-                confirmButtonColor: '#800000',
-                confirmButtonText: 'Close'
+                `
             });
         }
     } catch (error) {
@@ -1227,6 +1425,24 @@ async function editDocument(fileId) {
                             </select>
                         </div>
                         <div class="mb-2">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">OSAS Service</label>
+                            <select 
+                                id="editOsasService" 
+                                class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#800000] focus:border-[#800000] outline-none"
+                            >
+                                <option value="" ${!doc.osas_service ? 'selected' : ''}>Select Service</option>
+                                <option value="Guidance and service counseling services" ${doc.osas_service === 'Guidance and service counseling services' ? 'selected' : ''}>Guidance and service counseling services</option>
+                                <option value="Student Organization" ${doc.osas_service === 'Student Organization' ? 'selected' : ''}>Student Organization</option>
+                                <option value="Scholarship and Financial Assistance" ${doc.osas_service === 'Scholarship and Financial Assistance' ? 'selected' : ''}>Scholarship and Financial Assistance</option>
+                                <option value="Health Service" ${doc.osas_service === 'Health Service' ? 'selected' : ''}>Health Service</option>
+                                <option value="Culture and Art Program" ${doc.osas_service === 'Culture and Art Program' ? 'selected' : ''}>Culture and Art Program</option>
+                                <option value="Sports Development Program" ${doc.osas_service === 'Sports Development Program' ? 'selected' : ''}>Sports Development Program</option>
+                                <option value="Safety and Security Services" ${doc.osas_service === 'Safety and Security Services' ? 'selected' : ''}>Safety and Security Services</option>
+                                <option value="Student Housing and Residential Services" ${doc.osas_service === 'Student Housing and Residential Services' ? 'selected' : ''}>Student Housing and Residential Services</option>
+                                <option value="Social and Community Involvement Programs" ${doc.osas_service === 'Social and Community Involvement Programs' ? 'selected' : ''}>Social and Community Involvement Programs</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
                             <label class="block text-xs font-medium text-gray-700 mb-1">Description</label>
                             <textarea 
                                 id="editDocumentDescription" 
@@ -1283,6 +1499,7 @@ async function editDocument(fileId) {
                     const filename = document.getElementById('editDocumentName').value;
                     const cabinetNumber = document.getElementById('editCabinetNumber').value;
                     const category = document.getElementById('editDocumentCategory').value;
+                    const osasService = document.getElementById('editOsasService').value;
                     const description = document.getElementById('editDocumentDescription').value;
                     const status = document.getElementById('editDocumentStatus').value;
                     const borrowerInput = document.getElementById('editBorrowerName');
@@ -1298,7 +1515,7 @@ async function editDocument(fileId) {
                         return false;
                     }
 
-                    return { filename, cabinet_number: cabinetNumber.trim(), category, description, status, borrow_by: borrowerName || null };
+                    return { filename, cabinet_number: cabinetNumber.trim(), category, osas_service: osasService.trim(), description, status, borrow_by: borrowerName || null };
                 }
             }).then(async (result) => {
                 if (result.isConfirmed) {
@@ -1541,6 +1758,36 @@ function populateCategoryDropdown(categories) {
 }
 
 /**
+ * Populate OSAS Service dropdown dynamically based on documents
+ * @param {Array} services - Array of unique services
+ */
+function populateOsasServiceDropdown(services) {
+    const dropdown = document.getElementById('osasServiceSortDropdown');
+    if (!dropdown) return;
+
+    // Clear existing options except "All Services"
+    dropdown.innerHTML = '';
+
+    // Add "All Services" option
+    const allOption = document.createElement('button');
+    allOption.className = 'w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors text-sm text-gray-700';
+    allOption.setAttribute('data-osas-service', 'all');
+    allOption.textContent = 'All Services';
+    dropdown.appendChild(allOption);
+
+    // Add each unique service
+    services.forEach(service => {
+        if (service) {
+            const button = document.createElement('button');
+            button.className = 'w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors text-sm text-gray-700';
+            button.setAttribute('data-osas-service', service);
+            button.textContent = service;
+            dropdown.appendChild(button);
+        }
+    });
+}
+
+/**
  * Update row numbers in the table
  */
 function updateRowNumbers() {
@@ -1555,4 +1802,331 @@ function updateRowNumbers() {
             firstCell.textContent = index + 1;
         }
     });
+}
+
+/**
+ * Show Bulk Add Documents modal
+ */
+export function showBulkAddModal() {
+    Swal.fire({
+        title: 'Bulk Add Documents',
+        html: `
+            <form id="bulkAddForm" class="text-left">
+                <div class="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <h4 class="text-xs font-bold text-[#800000] mb-2 border-b border-gray-200 pb-1">Common Settings</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Category <span class="text-red-500">*</span></label>
+                            <select id="bulkCategory" class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#800000] focus:border-[#800000] outline-none">
+                                <option value="Documents">Documents</option>
+                                <option value="Sports">Sports</option>
+                                <option value="Objects">Objects</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">OSAS Service</label>
+                            <select id="bulkOsasService" class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#800000] focus:border-[#800000] outline-none">
+                                <option value="">Select Service</option>
+                                <option value="Guidance and service counseling services">Guidance and service counseling services</option>
+                                <option value="Student Organization">Student Organization</option>
+                                <option value="Scholarship and Financial Assistance">Scholarship and Financial Assistance</option>
+                                <option value="Health Service">Health Service</option>
+                                <option value="Culture and Art Program">Culture and Art Program</option>
+                                <option value="Sports Development Program">Sports Development Program</option>
+                                <option value="Safety and Security Services">Safety and Security Services</option>
+                                <option value="Student Housing and Residential Services">Student Housing and Residential Services</option>
+                                <option value="Social and Community Involvement Programs">Social and Community Involvement Programs</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Status <span class="text-red-500">*</span></label>
+                            <select id="bulkStatus" class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#800000] focus:border-[#800000] outline-none">
+                                <option value="available">Available</option>
+                                <option value="borrowed">Borrowed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-2 flex justify-between items-center">
+                    <h4 class="text-xs font-bold text-gray-800">Files to Add</h4>
+                    <button type="button" id="addBulkRowBtn" class="text-xs bg-[#800000] hover:bg-[#700000] text-white px-2 py-1 rounded-md transition-colors flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Add Another File
+                    </button>
+                </div>
+
+                <div id="bulkRowsContainer" class="h-[180px] overflow-y-auto pr-2 space-y-2 pb-2 border-t border-b border-gray-100 py-2">
+                    <!-- Initial Row -->
+                    <div class="bulk-row p-2 border border-gray-200 rounded-lg relative group bg-white shadow-sm hover:shadow-md transition-shadow">
+                        <button type="button" class="remove-bulk-row hidden absolute top-1 right-1 text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-red-50 transition-colors">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                        <div class="grid grid-cols-12 gap-2 mb-2">
+                            <div class="col-span-8">
+                                <label class="block text-xs font-medium text-gray-500 mb-1">File Name <span class="text-red-500">*</span></label>
+                                <input type="text" class="bulk-name w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#800000] focus:border-[#800000] outline-none" placeholder="Enter file name" required>
+                            </div>
+                            <div class="col-span-4">
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Cabinet No.</label>
+                                <input type="text" class="bulk-cab-num w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#800000] focus:border-[#800000] outline-none" placeholder="e.g. C1.X">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Description (Optional)</label>
+                            <input type="text" class="bulk-desc w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#800000] focus:border-[#800000] outline-none" placeholder="Enter description">
+                        </div>
+                    </div>
+                </div>
+                <div class="text-xs text-gray-500 mt-2 italic">* Minimum 1 file required.</div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Add All Documents',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#800000',
+        cancelButtonColor: '#6b7280',
+        width: '700px',
+        didOpen: () => {
+            const container = document.getElementById('bulkRowsContainer');
+            const addBtn = document.getElementById('addBulkRowBtn');
+
+            // Template for new row
+            const createRow = () => {
+                const div = document.createElement('div');
+                div.className = 'bulk-row p-2 border border-gray-200 rounded-lg relative group bg-white shadow-sm hover:shadow-md transition-shadow';
+                div.innerHTML = `
+                    <button type="button" class="remove-bulk-row absolute top-1 right-1 text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-red-50 transition-colors">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                    <div class="grid grid-cols-12 gap-2 mb-2">
+                        <div class="col-span-8">
+                            <label class="block text-xs font-medium text-gray-500 mb-1">File Name <span class="text-red-500">*</span></label>
+                            <input type="text" class="bulk-name w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#800000] focus:border-[#800000] outline-none" placeholder="Enter file name" required>
+                        </div>
+                        <div class="col-span-4">
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Cabinet No.</label>
+                            <input type="text" class="bulk-cab-num w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#800000] focus:border-[#800000] outline-none" placeholder="e.g. C1.X">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Description (Optional)</label>
+                        <input type="text" class="bulk-desc w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#800000] focus:border-[#800000] outline-none" placeholder="Enter description">
+                    </div>
+                `;
+                return div;
+            };
+
+            // Add Row Listener
+            addBtn.addEventListener('click', () => {
+                // Prepend the new row (add to top)
+                container.insertBefore(createRow(), container.firstChild);
+                // Scroll to top to see the new row
+                container.scrollTop = 0;
+            });
+
+            // Remove Row Delegation
+            container.addEventListener('click', (e) => {
+                const removeBtn = e.target.closest('.remove-bulk-row');
+                if (removeBtn) {
+                    if (container.querySelectorAll('.bulk-row').length > 1) {
+                        removeBtn.closest('.bulk-row').remove();
+                    } else {
+                        // If it's the last row, just clear values
+                        const row = removeBtn.closest('.bulk-row');
+                        row.querySelectorAll('input').forEach(input => input.value = '');
+                        Swal.showValidationMessage('At least one row is required');
+                    }
+                }
+            });
+        },
+        preConfirm: () => {
+            const category = document.getElementById('bulkCategory').value;
+            const osasService = document.getElementById('bulkOsasService').value;
+            const status = document.getElementById('bulkStatus').value;
+
+            const rows = document.querySelectorAll('.bulk-row');
+            const files = [];
+            let isValid = true;
+
+            rows.forEach((row, index) => {
+                const name = row.querySelector('.bulk-name').value.trim();
+                const cabinetNum = row.querySelector('.bulk-cab-num').value.trim();
+                const desc = row.querySelector('.bulk-desc').value.trim();
+
+                if (!name) {
+                    // Highlight error?
+                    row.querySelector('.bulk-name').classList.add('border-red-500');
+                    isValid = false;
+                } else {
+                    row.querySelector('.bulk-name').classList.remove('border-red-500');
+                    files.push({
+                        filename: name,
+                        cabinet_number: cabinetNum,
+                        description: desc
+                    });
+                }
+            });
+
+            if (!isValid) {
+                Swal.showValidationMessage('Please fill in all required file names');
+                return false;
+            }
+
+            if (files.length === 0) {
+                Swal.showValidationMessage('Please add at least one file');
+                return false;
+            }
+
+            return {
+                bulk: true,
+                category,
+                osas_service: osasService || '',
+                status,
+                files
+            };
+        }
+    }).then(async (result) => {
+        if (result.isConfirmed && result.value) {
+            // Logic to send to API (Similar to addDocument)
+            // Identify Cabinet ID first
+            // Method 1: Check URL parameter
+            let cabinetId = null;
+            const urlParams = new URLSearchParams(window.location.search);
+            const cabinetIdFromUrl = urlParams.get('cabinet_id');
+            if (cabinetIdFromUrl) {
+                cabinetId = parseInt(cabinetIdFromUrl, 10);
+            }
+
+            // Fallback methods (Dropdowns)
+            if (!cabinetId) {
+                const cabinetDropdownText = document.getElementById('cabinetDropdownText');
+                const cabinetDropdown = document.getElementById('cabinetDropdown');
+                if (cabinetDropdownText && cabinetDropdown &&
+                    cabinetDropdownText.textContent.trim() !== 'Select Cabinet' &&
+                    cabinetDropdownText.textContent.trim() !== 'All Cabinets') {
+                    const selectedText = cabinetDropdownText.textContent.trim();
+                    const options = cabinetDropdown.querySelectorAll('button[data-cabinet-id]');
+                    for (const option of options) {
+                        if (option.textContent.trim() === selectedText) {
+                            cabinetId = parseInt(option.getAttribute('data-cabinet-id'), 10);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!cabinetId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Unable to determine cabinet. Please select a cabinet first.',
+                    confirmButtonColor: '#800000'
+                });
+                return;
+            }
+
+            // Prepare Payload
+            const payload = {
+                bulk: true,
+                cabinet_id: cabinetId,
+                category: result.value.category,
+                osas_service: result.value.osas_service,
+                status: result.value.status,
+                files: result.value.files
+            };
+
+            try {
+                const response = await fetch('/OSAS-SIS/backend/CMS/api/files.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const apiResult = await response.json();
+
+                if (apiResult.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: apiResult.message || 'Documents added successfully.',
+                        confirmButtonColor: '#800000',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+
+                    // Reload
+                    const event = new CustomEvent('documentAdded', { detail: { cabinetId: parseInt(cabinetId, 10) } });
+                    window.dispatchEvent(event);
+                    await reloadDocumentsForCabinet(parseInt(cabinetId, 10));
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: apiResult.message || 'Failed to add documents',
+                        confirmButtonColor: '#800000'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to add documents: ' + error.message,
+                    confirmButtonColor: '#800000'
+                });
+            }
+        }
+    });
+}
+
+/**
+ * Export table to PDF (Print)
+ */
+function exportTableToPDF() {
+    const itemsTable = document.querySelector('table');
+    if (!itemsTable) return;
+
+    // Get cabinet name
+    const cabinetName = document.getElementById('cabinetViewTitle')?.textContent || 'Cabinet Documents';
+
+    // Create a new window for printing
+    const printWindow = window.open('', '', 'height=600,width=800');
+
+    printWindow.document.write('<html><head><title>' + cabinetName + ' - Export</title>');
+    printWindow.document.write('<style>');
+    printWindow.document.write('body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; padding: 20px; color: #333; }');
+    printWindow.document.write('table { width: 100%; border-collapse: collapse; margin-top: 20px; }');
+    printWindow.document.write('th, td { border: 1px solid #e2e8f0; padding: 12px 8px; text-align: left; font-size: 12px; }');
+    printWindow.document.write('th { background-color: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 11px; }');
+    printWindow.document.write('h1 { color: #800000; font-size: 24px; margin-bottom: 5px; }');
+    printWindow.document.write('p.subtitle { color: #64748b; font-size: 14px; margin-top: 0; }');
+    printWindow.document.write('</style>');
+    printWindow.document.write('</head><body>');
+
+    printWindow.document.write('<h1>' + cabinetName + '</h1>');
+    printWindow.document.write('<p class="subtitle">Generated on ' + new Date().toLocaleString() + '</p>');
+
+    // Clone the table
+    const tableClone = itemsTable.cloneNode(true);
+
+    // Remove Actions column (last column)
+    const rows = tableClone.querySelectorAll('tr');
+    rows.forEach(row => {
+        if (row.cells.length > 0) {
+            row.deleteCell(-1);
+        }
+    });
+
+    printWindow.document.write(tableClone.outerHTML);
+    printWindow.document.write('</body></html>');
+
+    printWindow.document.close();
+    printWindow.focus();
+
+    // Wait for content to load then print
+    setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+    }, 500);
 }

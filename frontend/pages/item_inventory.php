@@ -116,6 +116,7 @@ $damaged_percentage = $total_items > 0 ? round(($damaged_items / $total_items) *
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../frontend/images/spc.png">
     <title>Item Inventory | OSAS SIS</title>
     <?= vite(['backend/js/main.js', 'frontend/css/styles.css']) ?>
     <!-- SweetAlert2 -->
@@ -185,11 +186,21 @@ $damaged_percentage = $total_items > 0 ? round(($damaged_items / $total_items) *
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl mx-4 max-h-[85vh] overflow-hidden flex flex-col">
             <div class="flex items-center justify-between px-5 py-3 border-b border-slate-200">
                 <h3 id="inventoryModalTitle" class="text-sm font-semibold text-slate-900">Inventory Items</h3>
-                <button type="button" onclick="closeInventoryModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
-                        <path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 0 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-                    </svg>
-                </button>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="printModalItems()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#800020] hover:bg-[#5c0016] rounded-md transition-colors cursor-pointer" title="Print / Save as PDF">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                            <path d="M6 9V2h12v7"></path>
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                            <path d="M6 14h12v8H6z"></path>
+                        </svg>
+                        Export PDF
+                    </button>
+                    <button type="button" onclick="closeInventoryModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                            <path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 0 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <div class="p-4 overflow-y-auto custom-scrollbar text-sm">
@@ -534,8 +545,8 @@ $damaged_percentage = $total_items > 0 ? round(($damaged_items / $total_items) *
                                 <a href="item_management.php" class="text-xs font-medium text-[#800020] hover:text-[#5c0016]">View all</a>
                             </div>
                             
-                            <?php if (!empty($recent_items)): ?>
-                                <div class="space-y-2 custom-scrollbar max-h-[600px] overflow-y-auto pr-1">
+                            <div id="recentActivityList" class="space-y-2 custom-scrollbar max-h-[600px] overflow-y-auto pr-1">
+                                <?php if (!empty($recent_items)): ?>
                                     <?php foreach ($recent_items as $item): ?>
                                         <div class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-100 hover:border-slate-300 hover:bg-slate-50 transition-all">
                                             <?php if ($item['image']): ?>
@@ -561,20 +572,108 @@ $damaged_percentage = $total_items > 0 ? round(($damaged_items / $total_items) *
                                             </div>
                                         </div>
                                     <?php endforeach; ?>
-                                </div>
-                            <?php else: ?>
-                                <div class="text-center py-8">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto h-8 w-8 text-slate-300">
-                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                                    </svg>
-                                    <p class="mt-2 text-xs text-slate-500">No recent items</p>
-                                </div>
-                            <?php endif; ?>
+                                <?php else: ?>
+                                    <div class="text-center py-8">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto h-8 w-8 text-slate-300">
+                                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                        </svg>
+                                        <p class="mt-2 text-xs text-slate-500">No recent items</p>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
 
             </div>
+
+<script>
+    // Real-time Update for Recent Activity
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        function updateRecentActivity() {
+            fetch('/OSAS-SIS/backend/items/api.php?mode=recent&limit=5')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        renderRecentItems(result.data);
+                    }
+                })
+                .catch(err => console.error('Error fetching recent items:', err));
+        }
+
+        function renderRecentItems(items) {
+            const container = document.getElementById('recentActivityList');
+            if (!container) return;
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto h-8 w-8 text-slate-300">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        </svg>
+                        <p class="mt-2 text-xs text-slate-500">No recent items</p>
+                    </div>`;
+                return;
+            }
+
+            let html = '';
+            items.forEach(item => {
+                const imgHtml = item.image 
+                    ? `<img src="../../frontend/images/items/${escapeHtml(item.image)}" alt="${escapeHtml(item.item_name)}" class="w-12 h-12 rounded-lg object-cover border border-slate-200">`
+                    : `<div class="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center border border-slate-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-slate-400">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="9" cy="9" r="2"></circle>
+                                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+                            </svg>
+                       </div>`;
+                       
+                const qtyClass = item.quantity == 0 ? 'text-red-600' : (item.quantity < 5 ? 'text-amber-600' : 'text-slate-600');
+                
+                let statusClass = 'bg-orange-100 text-orange-700'; // Default
+                if (item.status === 'Available') statusClass = 'bg-emerald-100 text-emerald-700';
+                else if (item.status === 'Damaged') statusClass = 'bg-red-100 text-red-700';
+
+                html += `
+                    <div class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-100 hover:border-slate-300 hover:bg-slate-50 transition-all">
+                        ${imgHtml}
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-2 mb-1">
+                                <p class="text-xs font-semibold text-slate-900 truncate">${escapeHtml(item.item_name)}</p>
+                                <span class="flex-shrink-0 text-xs font-bold ${qtyClass}">${parseInt(item.quantity).toLocaleString()}</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mb-1.5">${escapeHtml(item.category)}</p>
+                            <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${statusClass}">
+                                ${escapeHtml(item.status)}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        // Poll every 5 seconds
+        setInterval(updateRecentActivity, 5000);
+        
+        // Initial fetch after a short delay
+        setTimeout(updateRecentActivity, 2000);
+    });
+</script>
 
             <!-- Quick Actions removed as per user request -->
 
@@ -660,6 +759,114 @@ $damaged_percentage = $total_items > 0 ? round(($damaged_items / $total_items) *
     <script>
         // Embed inventory data for modal filtering
         window.inventoryItemsData = <?= json_encode($all_items, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?> || [];
+        window.currentModalFilterType = 'all'; // Track current filter type
+        window.currentSearchType = ''; // Track search (semester or date)
+        window.currentSearchValue = ''; // Track search value
+
+        function printModalItems() {
+            const items = filterInventoryData(window.currentModalFilterType);
+            const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            let titleSuffix = '';
+            
+            if (window.currentModalFilterType === 'available') titleSuffix = ' - Available Items';
+            else if (window.currentModalFilterType === 'unavailable') titleSuffix = ' - Unavailable Items';
+            else if (window.currentModalFilterType === 'damaged') titleSuffix = ' - Damaged Items';
+            else if (window.currentModalFilterType === 'recent') titleSuffix = ' - Recent Additions';
+            else if (window.currentModalFilterType === 'low_stock') titleSuffix = ' - Low Stock Items';
+            else if (window.currentModalFilterType === 'search') {
+                if (window.currentSearchType === 'semester') titleSuffix = ' - ' + window.currentSearchValue;
+                else if (window.currentSearchType === 'date') titleSuffix = ' - ' + window.currentSearchValue;
+                else titleSuffix = ' - Filtered Items';
+            }
+            else titleSuffix = ' - All Items';
+
+            // Create printable content
+            let rowsHtml = '';
+            if (items.length === 0) {
+                rowsHtml = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No items found.</td></tr>';
+            } else {
+                items.forEach((item, index) => {
+                    // Normalize fields
+                    const sport = item.sport || '-';
+                    const location = item.location || '-';
+                    const brand = item.brand || '-';
+                    
+                    rowsHtml += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>
+                                <div style="font-weight: bold;">${item.item_name || ''}</div>
+                                <div style="font-size: 11px; color: #666;">ID: ${item.unique_id || '-'}</div>
+                            </td>
+                            <td>${item.category || '-'}</td>
+                            <td>${sport}</td>
+                            <td>${brand}</td>
+                            <td>${location}</td>
+                            <td style="text-align: center;">${item.quantity || 0}</td>
+                            <td style="text-align: center;">${item.status || '-'}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Inventory Report${titleSuffix}</title>
+                    <style>
+                        body { font-family: sans-serif; padding: 20px; color: #333; }
+                        h1 { color: #800020; font-size: 24px; margin-bottom: 5px; }
+                        .header-meta { font-size: 12px; color: #666; margin-bottom: 20px; border-bottom: 2px solid #800020; padding-bottom: 10px; }
+                        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f8f9fa; color: #333; font-weight: bold; }
+                        tr:nth-child(even) { background-color: #f9f9f9; }
+                        @media print {
+                            .no-print { display: none; }
+                            th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h1 style="margin: 0;">St. Peter's College</h1>
+                        <p style="margin: 5px 0 0; font-size: 14px;">Sports Equipment Management System</p>
+                    </div>
+                    
+                    <h1>Inventory Report${titleSuffix}</h1>
+                    <div class="header-meta">
+                        Generated on: ${dateStr}<br>
+                        Total Items: ${items.length}
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">No.</th>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Sport</th>
+                                <th>Brand</th>
+                                <th>Location</th>
+                                <th style="text-align: center; width: 60px;">Qty</th>
+                                <th style="text-align: center; width: 80px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+                    
+                    <script>
+                        window.onload = function() { window.print(); }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
 
         function filterInventoryData(type) {
             const now = new Date();
@@ -683,6 +890,18 @@ $damaged_percentage = $total_items > 0 ? round(($damaged_items / $total_items) *
                     return false;
                 } else if (type === 'low_stock') {
                     return qty > 0 && qty < 5;
+                } else if (type === 'search') {
+                    // Filter based on currently stored search params
+                    if (window.currentSearchType === 'semester') {
+                        // Filter by semester
+                        return (item.semester || '') === window.currentSearchValue;
+                    } else if (window.currentSearchType === 'date') {
+                        // Filter by specific date (YYYY-MM-DD compare)
+                        if (!item.created_at) return false;
+                        // item.created_at usually "YYYY-MM-DD HH:MM:SS"
+                        const itemDate = item.created_at.split(' ')[0]; 
+                        return itemDate === window.currentSearchValue;
+                    }
                 }
                 // 'all' fallback
                 return true;
@@ -701,8 +920,14 @@ $damaged_percentage = $total_items > 0 ? round(($damaged_items / $total_items) *
             else if (type === 'damaged') titleSuffix = ' - Damaged';
             else if (type === 'recent') titleSuffix = ' - Recent Additions';
             else if (type === 'low_stock') titleSuffix = ' - Low Stock';
+            else if (type === 'search') {
+                if (window.currentSearchType === 'semester') titleSuffix = ' - ' + window.currentSearchValue;
+                else if (window.currentSearchType === 'date') titleSuffix = ' - ' + window.currentSearchValue;
+                else titleSuffix = ' - Search Results';
+            }
 
             titleEl.textContent = 'Inventory Items' + titleSuffix;
+            window.currentModalFilterType = type; // Store for export
 
             const items = filterInventoryData(type);
 
@@ -800,12 +1025,16 @@ $damaged_percentage = $total_items > 0 ? round(($damaged_items / $total_items) *
 
         // Fetch Data
         async function applyFilter() {
-            const type = document.getElementById('filterType').value;
-            const value = type === 'semester' 
-                ? document.getElementById('semesterValue').value 
-                : document.getElementById('dateValue').value;
             const resultsContainer = document.getElementById('filterResults');
-
+            const filterType = document.getElementById('filterType').value;
+            let value = '';
+            
+            if (filterType === 'semester') {
+                value = document.getElementById('semesterValue').value;
+            } else {
+                value = document.getElementById('dateValue').value;
+            }
+            
             if (!value) {
                 Swal.fire({
                     icon: 'warning',
@@ -816,81 +1045,14 @@ $damaged_percentage = $total_items > 0 ? round(($damaged_items / $total_items) *
                 return;
             }
 
-            // Show Loading
-            resultsContainer.innerHTML = `
-                <div class="flex flex-col items-center justify-center py-8 text-slate-500">
-                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#800020] mb-2"></div>
-                    <p class="text-sm">Searching items...</p>
-                </div>
-            `;
-
-            try {
-                const response = await fetch(`get_filtered_items.php?type=${type}&value=${encodeURIComponent(value)}`);
-                const data = await response.json();
-
-                if (data.success) {
-                    if (data.items.length > 0) {
-                        let html = `
-                            <div class="flex items-center justify-between mb-4 px-1">
-                                <span class="text-sm font-semibold text-slate-700">Found ${data.items.length} records</span>
-                                <span class="badge bg-[#800020]/10 text-[#800020] border border-[#800020]/20">Total Qty: ${data.count}</span>
-                            </div>
-                            <div class="space-y-2">
-                        `;
-                        
-                        data.items.forEach(item => {
-                            const itemImage = item.image ? `../../frontend/images/items/${item.image}` : '';
-                            html += `
-                                <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-300 transition-colors">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200">
-                                            ${item.image ? 
-                                                `<img src="${itemImage}" alt="${item.item_name}" class="w-full h-full object-cover">` : 
-                                                `<span class="text-lg">📦</span>`
-                                            }
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-semibold text-slate-900">${item.item_name}</p>
-                                            <p class="text-xs text-slate-500">${item.category} • ${new Date(item.created_at).toLocaleDateString()}</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-sm font-bold text-slate-900">Qty: ${item.quantity}</div>
-                                        <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ${item.status === 'Available' ? 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20' : 'bg-orange-50 text-orange-700 ring-1 ring-inset ring-orange-600/20'}">
-                                            ${item.status}
-                                        </span>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        
-                        html += '</div>';
-                        resultsContainer.innerHTML = html;
-                    } else {
-                        resultsContainer.innerHTML = `
-                            <div class="text-center py-8">
-                                <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-slate-400">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-                                    </svg>
-                                </div>
-                                <h3 class="mt-2 text-sm font-semibold text-slate-900">No items found</h3>
-                                <p class="mt-1 text-xs text-slate-500">No items matched your ${type} filter.</p>
-                            </div>
-                        `;
-                    }
-                } else {
-                    throw new Error(data.message);
-                }
-            } catch (error) {
-                console.error(error);
-                resultsContainer.innerHTML = `
-                    <div class="text-center py-8 text-red-500">
-                        <p class="text-sm font-medium">Error loading data</p>
-                        <p class="text-xs mt-1">Please try again later.</p>
-                    </div>
-                `;
-            }
+            // Set global search state
+            window.currentSearchType = filterType;
+            window.currentSearchValue = value;
+            
+            // Close filter modal and open inventory result modal to see full results and export
+            // We reuse the main modal since it already has the export functionality
+            closeFilterModal();
+            openInventoryModal('search');
         }
     </script>
 
