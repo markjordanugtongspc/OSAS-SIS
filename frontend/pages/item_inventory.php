@@ -816,51 +816,201 @@ $damaged_percentage = $total_items > 0 ? round(($damaged_items / $total_items) *
                 <head>
                     <title>Inventory Report${titleSuffix}</title>
                     <style>
-                        body { font-family: sans-serif; padding: 20px; color: #333; }
-                        h1 { color: #800020; font-size: 24px; margin-bottom: 5px; }
-                        .header-meta { font-size: 12px; color: #666; margin-bottom: 20px; border-bottom: 2px solid #800020; padding-bottom: 10px; }
-                        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                        th { background-color: #f8f9fa; color: #333; font-weight: bold; }
-                        tr:nth-child(even) { background-color: #f9f9f9; }
-                        @media print {
-                            .no-print { display: none; }
-                            th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+                        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+                        @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
+
+                        @page {
+                            size: A4 landscape;
+                            margin: 1cm;
+                        }
+
+                        html, body {
+                            padding: 0;
+                            margin: 0;
+                            height: 100%;
+                        }
+
+                        body {
+                            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                            color: #1f2937;
+                            line-height: 1.4;
+                            background: #fff;
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact;
+                            font-size: 10px;
+                        }
+
+                        .print-wrapper {
+                            width: 100%;
+                            margin: 0 auto;
+                            position: relative;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                        }
+
+                        .old-english {
+                            font-family: 'UnifrakturMaguntia', "Old English Text MT", "Engravers Old English BT", "Goudy Text MT", serif;
+                            font-weight: 400; 
+                        }
+
+                        /* Header */
+                        .print-header {
+                            text-align: center;
+                            margin-bottom: 20px;
+                        }
+
+                        .header-logo {
+                            width: 80px;
+                            height: auto;
+                            margin-bottom: 5px;
+                        }
+
+                        .header-text h1 {
+                            font-family: 'UnifrakturMaguntia', "Old English Text MT", "Engravers Old English BT", "Goudy Text MT", serif;
+                            font-size: 28px;
+                            color: #800020;
+                            margin: 0;
+                            letter-spacing: 1px;
+                            font-weight: 400;
+                        }
+
+                        .header-text p {
+                            font-size: 12px;
+                            font-weight: 500;
+                            text-transform: uppercase;
+                            color: #374151;
+                            margin: 5px 0 0;
+                        }
+
+                        .report-meta {
+                            text-align: center;
+                            margin-bottom: 30px;
+                            border-bottom: 2px solid #800020;
+                            padding-bottom: 10px;
+                            width: 100%;
+                        }
+
+                        .report-title {
+                            font-size: 14px;
+                            font-weight: 700;
+                            color: #111827;
+                            text-transform: uppercase;
+                            letter-spacing: 0.05em;
+                            margin-bottom: 2px;
+                        }
+
+                        .report-date {
+                            font-size: 10px;
+                            color: #6b7280;
+                        }
+
+                        /* Table Design */
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            border: 1px solid #e5e7eb;
+                            border-radius: 8px;
+                            overflow: hidden;
+                        }
+
+                        thead {
+                            display: table-header-group;
+                        }
+
+                        thead tr {
+                            background: linear-gradient(to right, #800020, #5c0016) !important;
+                            color: #ffffff !important;
+                        }
+
+                        th {
+                            padding: 8px 10px;
+                            text-align: left;
+                            font-size: 9px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.05em;
+                            color: #ffffff !important;
+                            border-bottom: 1px solid #800020;
+                        }
+
+                        tbody tr {
+                            border-bottom: 1px solid #f3f4f6;
+                        }
+
+                        tbody tr:nth-child(even) {
+                            background-color: #f9fafb;
+                        }
+
+                        td {
+                            padding: 6px 10px;
+                            vertical-align: middle;
+                            font-size: 10px;
+                            color: #374151;
+                        }
+
+                        /* Footer */
+                        .footer {
+                            position: fixed;
+                            bottom: 0;
+                            left: 0;
+                            right: 0;
+                            text-align: center;
+                            font-size: 8px;
+                            color: #9ca3af;
+                            padding-top: 1rem;
+                            background: #fff;
+                            border-top: 1px solid #f3f4f6;
+                            width: 100%;
                         }
                     </style>
                 </head>
                 <body>
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <h1 style="margin: 0;">St. Peter's College</h1>
-                        <p style="margin: 5px 0 0; font-size: 14px;">Sports Equipment Management System</p>
+                    <div class="print-wrapper">
+                        <div class="print-header">
+                            <img src="/OSAS-SIS/frontend/images/spc.png" alt="SPC Logo" class="header-logo">
+                            <div class="header-text">
+                                <h1>St. Peter's College</h1>
+                                <p>Office of Student Affairs and Services • SIS</p>
+                            </div>
+                        </div>
+                        
+                        <div class="report-meta">
+                            <div class="report-title">Inventory Report${titleSuffix}</div>
+                            <div class="report-date">Generated on ${dateStr} • Total Items: ${items.length}</div>
+                        </div>
+                        
+                        <div style="width: 100%;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;">No.</th>
+                                        <th>Item Name</th>
+                                        <th>Category</th>
+                                        <th>Sport</th>
+                                        <th>Brand</th>
+                                        <th>Location</th>
+                                        <th style="text-align: center; width: 60px;">Qty</th>
+                                        <th style="text-align: center; width: 80px;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${rowsHtml}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="footer">
+                            System Generated Report &bull; OSAS-SIS &bull; Inventory Management System
+                        </div>
                     </div>
-                    
-                    <h1>Inventory Report${titleSuffix}</h1>
-                    <div class="header-meta">
-                        Generated on: ${dateStr}<br>
-                        Total Items: ${items.length}
-                    </div>
-                    
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 40px;">No.</th>
-                                <th>Item Name</th>
-                                <th>Category</th>
-                                <th>Sport</th>
-                                <th>Brand</th>
-                                <th>Location</th>
-                                <th style="text-align: center; width: 60px;">Qty</th>
-                                <th style="text-align: center; width: 80px;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${rowsHtml}
-                        </tbody>
-                    </table>
                     
                     <script>
-                        window.onload = function() { window.print(); }
+                        window.onload = function() { 
+                            setTimeout(() => {
+                                window.print();
+                            }, 500);
+                        }
                     <\/script>
                 </body>
                 </html>

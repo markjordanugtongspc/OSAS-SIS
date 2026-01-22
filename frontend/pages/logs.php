@@ -375,6 +375,7 @@ try {
             const styles = `
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+                    @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
 
                     @page {
                         size: A4 landscape;
@@ -401,54 +402,54 @@ try {
                         width: 100%;
                         margin: 0 auto;
                         position: relative;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center; /* Center */
                     }
 
-                    /* Brand Header */
+                    .old-english {
+                        font-family: 'UnifrakturMaguntia', "Old English Text MT", "Engravers Old English BT", "Goudy Text MT", serif;
+                        font-weight: 400;
+                    }
+
+                    /* Header */
                     .print-header {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: flex-end;
-                        margin-bottom: 1.5rem;
-                        padding-bottom: 1rem;
-                        border-bottom: 2px solid #800020; /* System Burgundy */
-                    }
-
-                    .header-left {
-                        display: flex;
-                        align-items: center;
-                        gap: 0.75rem;
+                        text-align: center;
+                        margin-bottom: 20px;
                     }
 
                     .header-logo {
-                        width: 40px;
-                        height: 40px;
-                        object-fit: contain;
+                        width: 80px;
+                        height: auto;
+                        margin-bottom: 5px;
                     }
 
                     .header-text h1 {
-                        font-size: 14px;
-                        font-weight: 800;
-                        text-transform: uppercase;
+                        font-family: 'UnifrakturMaguntia', "Old English Text MT", "Engravers Old English BT", "Goudy Text MT", serif;
+                        font-size: 28px;
                         color: #800020;
                         margin: 0;
-                        line-height: 1.1;
+                        letter-spacing: 1px;
+                        font-weight: 400;
                     }
 
                     .header-text p {
-                        font-size: 9px;
-                        color: #4b5563;
-                        margin: 2px 0 0;
+                        font-size: 12px;
                         font-weight: 500;
                         text-transform: uppercase;
-                        letter-spacing: 0.05em;
+                        color: #374151;
+                        margin: 5px 0 0;
                     }
 
                     .report-meta {
-                        text-align: right;
+                        text-align: center;
+                        margin-bottom: 30px;
+                        border-bottom: 2px solid #800020;
+                        padding-bottom: 10px;
                     }
 
                     .report-title {
-                        font-size: 12px;
+                        font-size: 14px;
                         font-weight: 700;
                         color: #111827;
                         text-transform: uppercase;
@@ -457,7 +458,7 @@ try {
                     }
 
                     .report-date {
-                        font-size: 9px;
+                        font-size: 10px;
                         color: #6b7280;
                     }
 
@@ -554,20 +555,21 @@ try {
                     <body>
                         <div class="print-wrapper">
                             <div class="print-header">
-                                <div class="header-left">
-                                    <img src="../../frontend/images/spc.png" alt="Logo" class="header-logo" />
-                                    <div class="header-text">
-                                        <h1>St. Peter's College</h1>
-                                        <p>Office of Student Affairs and Services • SIS</p>
-                                    </div>
-                                </div>
-                                <div class="report-meta">
-                                    <div class="report-title">Inventory Logs Audit</div>
-                                    <div class="report-date">Generated on ${date}</div>
+                                <img src="/OSAS-SIS/frontend/images/spc.png" alt="SPC Logo" class="header-logo">
+                                <div class="header-text">
+                                    <h1>St. Peter's College</h1>
+                                    <p>Office of Student Affairs and Services • SIS</p>
                                 </div>
                             </div>
                             
-                            ${clone.outerHTML}
+                            <div class="report-meta">
+                                <div class="report-title">Inventory Logs Audit</div>
+                                <div class="report-date">Generated on ${date}</div>
+                            </div>
+                            
+                            <div style="width: 100%;">
+                                ${clone.outerHTML}
+                            </div>
 
                             <div class="footer">
                                 System Generated Report &bull; OSAS-SIS &bull; Inventory Audit
@@ -639,6 +641,7 @@ try {
             const styles = `
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+                    @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
 
                     @page {
                         size: A4 portrait;
@@ -663,47 +666,45 @@ try {
                         overflow: hidden;
                     }
 
+                    .old-english {
+                        font-family: 'UnifrakturMaguntia', "Old English Text MT", "Engravers Old English BT", "Goudy Text MT", serif;
+                        font-weight: 400;
+                    }
+
                     /* Header */
-                    .header {
-                        padding: 2rem;
-                        border-bottom: 4px solid #800020;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: flex-end;
+                    .print-header {
+                        text-align: center;
+                        padding-bottom: 2rem;
+                        border-bottom: 2px solid #800020;
+                        margin-bottom: 2rem;
                     }
 
-                    .header-left {
-                        display: flex;
-                        align-items: center;
-                        gap: 1rem;
+                    .header-logo {
+                        width: 80px;
+                        height: auto;
+                        margin-bottom: 5px;
                     }
 
-                    .logo {
-                        width: 60px;
-                        height: 60px;
-                        object-fit: contain;
-                    }
-
-                    .header-title h1 {
-                        font-size: 18px;
-                        font-weight: 800;
+                    .header-text h1 {
+                        font-family: 'UnifrakturMaguntia', "Old English Text MT", "Engravers Old English BT", "Goudy Text MT", serif;
+                        font-size: 28px;
                         color: #800020;
                         margin: 0;
-                        text-transform: uppercase;
-                        line-height: 1.1;
+                        letter-spacing: 1px;
+                        font-weight: 400;
                     }
 
-                    .header-title p {
-                        font-size: 11px;
-                        color: #6b7280;
-                        margin: 4px 0 0;
+                    .header-text p {
+                        font-size: 12px;
                         font-weight: 500;
                         text-transform: uppercase;
-                        letter-spacing: 0.05em;
+                        color: #374151;
+                        margin: 5px 0 0;
                     }
 
                     .meta {
-                        text-align: right;
+                        text-align: center;
+                        margin-bottom: 2rem;
                     }
 
                     .meta-title {
@@ -816,20 +817,24 @@ try {
                     .quantity-change-box {
                         display: flex;
                         align-items: center;
-                        gap: 1.5rem;
+                        background: #f9fafb;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 8px;
+                        padding: 0.75rem 1rem;
+                        gap: 1rem;
                     }
 
                     .qt-row {
                         display: flex;
                         flex-direction: column;
+                        align-items: center;
                     }
 
                     .qt-label {
                         font-size: 9px;
-                        font-weight: 600;
                         color: #6b7280;
                         text-transform: uppercase;
-                        margin-bottom: 2px;
+                        font-weight: 600;
                     }
 
                     .qt-val {
@@ -838,18 +843,17 @@ try {
                         color: #374151;
                     }
 
+                    .qt-val.highlight {
+                        color: #800020;
+                    }
+
                     .qt-val.line-through {
                         text-decoration: line-through;
                         color: #9ca3af;
                     }
 
-                    .qt-val.highlight {
-                        color: #800020;
-                        font-size: 20px;
-                    }
-
                     .qt-arrow {
-                        font-size: 20px;
+                        font-size: 18px;
                         color: #d1d5db;
                     }
 
@@ -857,106 +861,106 @@ try {
                         margin-left: auto;
                         background: #fee2e2;
                         color: #991b1b;
-                        font-size: 12px;
+                        font-size: 11px;
                         font-weight: 700;
-                        padding: 4px 10px;
-                        border-radius: 6px;
+                        padding: 2px 8px;
+                        border-radius: 4px;
                     }
 
                     .qt-diff.full-width {
-                        width: 100%;
-                        text-align: center;
                         margin-left: 0;
+                        flex: 1;
+                        text-align: center;
                     }
 
                     /* Reason Box */
                     .reason-box {
-                        margin-top: 2rem;
+                        background: #f8fafc;
+                        border: 1px dashed #cbd5e1;
                         padding: 1.5rem;
-                        background: #fff;
-                        border: 2px dashed #e5e7eb;
-                        border-radius: 12px;
-                    }
-
-                    .reason-text {
-                        font-style: italic;
-                        color: #4b5563;
+                        border-radius: 8px;
                         font-size: 14px;
+                        color: #475569;
+                        line-height: 1.6;
+                        font-style: italic;
                     }
 
                     .footer {
                         text-align: center;
-                        margin-top: 3rem;
-                        padding-top: 2rem;
-                        border-top: 1px solid #e5e7eb;
                         font-size: 10px;
                         color: #9ca3af;
+                        padding-top: 2rem;
+                        border-top: 1px solid #f3f4f6;
+                        margin-top: 2rem;
                     }
-
                 </style>
             `;
 
             printWindow.document.write(`
                 <html>
                     <head>
-                        <title>Inventory Log Detail - #${log.id}</title>
+                        <title>Log Details #${log.id}</title>
                         ${styles}
                     </head>
                     <body>
-                        <br>
-                        <div class="container">
-                            <div class="header">
-                                <div class="header-left">
-                                    <img src="../../frontend/images/spc.png" alt="Logo" class="logo" />
-                                    <div class="header-title">
-                                        <h1>St. Peter's College</h1>
-                                        <p>Office of Student Affairs and Services • SIS</p>
-                                    </div>
-                                </div>
-                                <div class="meta">
-                                    <div class="meta-title">Log Detail Report</div>
-                                    <div class="meta-date">${date}</div>
-                                </div>
-                            </div>
-
-                            <div class="content">
-                                <div class="log-id">
-                                    <span>Log Entry #${log.id}</span>
-                                </div>
-
-                                <div class="main-grid">
-                                    <div class="image-container">
-                                        ${imageHtml}
-                                    </div>
-                                    <div class="details-list">
-                                        <div class="field-group">
-                                            <div class="label">Item Name</div>
-                                            <div class="value highlight">${log.item_name}</div>
-                                        </div>
-                                        <div class="field-group">
-                                            <div class="label">Date & Time Logged</div>
-                                            <div class="value">${new Date(log.created_at).toLocaleString()}</div>
-                                        </div>
-                                        <div class="field-group">
-                                            <div class="label">Activity Type</div>
-                                            <div class="value">${log.action}</div>
+                        <div class="print-wrapper">
+                            <div class="container">
+                                <div class="content">
+                                    <div class="print-header">
+                                        <img src="/OSAS-SIS/frontend/images/spc.png" alt="SPC Logo" class="header-logo">
+                                        <div class="header-text">
+                                            <h1>St. Peter's College</h1>
+                                            <p>Office of Student Affairs and Services • SIS</p>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="label">Quantity Verification</div>
-                                <div class="quantity-box">
-                                    ${changesHtml}
-                                </div>
+                                    <div class="meta">
+                                        <div class="meta-title">Log Details Report</div>
+                                        <div class="meta-date">Generated on ${date}</div>
+                                    </div>
+                                    
+                                    <div class="log-id">
+                                        <span>Log #${log.id}</span>
+                                    </div>
 
-                                <div class="reason-box">
-                                    <div class="label">Reason Provided</div>
-                                    <div class="reason-text">"${log.reason}"</div>
-                                </div>
+                                    <div class="main-grid">
+                                        <div class="image-container">
+                                            ${imageHtml}
+                                        </div>
 
-                                <div class="footer">
-                                    This document is a system-generated record from the OSAS Student Information System.<br>
-                                    Inventory Management Module
+                                        <div class="details-list">
+                                            <div class="field-group">
+                                                <div class="label">Date & Time Logged</div>
+                                                <div class="value">${new Date(log.created_at).toLocaleString()}</div>
+                                            </div>
+
+                                            <div class="field-group">
+                                                <div class="label">Activity Type</div>
+                                                <div class="value" style="color: #800020; text-transform: uppercase;">${log.action}</div>
+                                            </div>
+
+                                            <div class="field-group">
+                                                <div class="label">Item Name</div>
+                                                <div class="value" style="font-size: 18px;">${log.item_name}</div>
+                                            </div>
+
+                                            <div class="field-group">
+                                                <div class="label">Inventory Changes</div>
+                                                ${changesHtml}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <div class="label">Reason for Action</div>
+                                        <div class="reason-box">
+                                            "${log.reason}"
+                                        </div>
+                                    </div>
+
+                                    <div class="footer">
+                                        System Generated Record • OSAS-SIS Inventory Audit Trail
+                                    </div>
                                 </div>
                             </div>
                         </div>

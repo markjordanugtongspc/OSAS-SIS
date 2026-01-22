@@ -19,6 +19,10 @@
  ---
  
  ## Key Modules
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> e38245eebded5a5ef35275c2dda3cab30131b073
  ### Sport Inventory System (SIS)
  - Dashboard overview (charts, statistics)
  - Item Inventory listing
@@ -219,12 +223,22 @@
  ## Authors / Contributors
  
  - Add your team members here:
+<<<<<<< HEAD
    - Name 1
    - Name 2
    - Name 3
+=======
+   - @markjordanugtongspc
+   - @yansanity1998
+   - @casanmacaan
+>>>>>>> e38245eebded5a5ef35275c2dda3cab30131b073
  
  ---
  
  ## License
  
+<<<<<<< HEAD
  Specify your license here (MIT / Proprietary / School Project).
+=======
+ Specify your license here (MIT / Proprietary / School Project).
+>>>>>>> e38245eebded5a5ef35275c2dda3cab30131b073

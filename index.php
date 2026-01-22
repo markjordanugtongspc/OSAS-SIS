@@ -139,7 +139,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <img src="frontend/images/spc.png" alt="St. Peter's College Logo" class="w-full h-full object-cover">
                 </div>
                 <h1 class="text-5xl font-bold text-white mb-1 tracking-wide font-old-english">St. Peter's College</h1>
-                <h2 class="text-sm text-white/70 font-medium mb-8 tracking-[0.2em] uppercase">Office of the Student Affairs and Services</h2>
+                <h2 class="text-sm text-white/70 font-medium mb-8 tracking-[0.2em] uppercase">Office of Student Affairs and Services</h2>
                 <div class="flex flex-col items-center gap-1">
                     <!-- Sports Equipment -->
                     <div class="flex items-center justify-center gap-2 text-white/50 text-sm font-medium tracking-wider uppercase">
@@ -170,7 +170,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <img src="frontend/images/spc.png" alt="St. Peter's College Logo" class="w-full h-full object-cover">
                     </div>
                     <h2 class="text-3xl font-bold text-[#800020] font-old-english mb-1">St. Peter's College</h2>
-                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.15em] mb-4">Office of the Student Affairs and Services</h3>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.15em] mb-4">Office of Student Affairs and Services</h3>
                     <div class="flex flex-col items-center gap-1">
                         <!-- Sports Equipment -->
                         <div class="flex items-center justify-center gap-1.5 text-gray-500 text-xs uppercase tracking-wide">

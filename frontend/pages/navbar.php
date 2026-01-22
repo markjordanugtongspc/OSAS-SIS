@@ -31,7 +31,7 @@
             </div>
             <div class="sidebar-text">
                 <h1 class="text-lg font-bold text-white whitespace-nowrap">SPC - OSAS</h1>
-                <p class="text-[10px] text-white/70 whitespace-nowrap">Student Affairs and Services</p>
+                <p class="text-[10px] text-white/70 leading-tight">Office of Student Affairs and Services</p>
             </div>
         </div>
         
@@ -155,6 +155,17 @@
 
         <!-- Divider -->
         <div class="nav-divider sidebar-text my-2 mx-3 border-t border-white/20"></div>
+
+        <!-- Admin: User Management -->
+        <?php if (isset($_SESSION['position']) && stripos($_SESSION['position'], 'Admin') !== false): ?>
+        <a href="<?= $base_path ?>pages/adduser.php" class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-lg <?= $current_page == 'adduser.php' ? 'bg-white/10 text-white font-medium' : 'text-white/80 hover:text-white hover:bg-white/10' ?> transition-all group relative">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 flex-shrink-0">
+                <path d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z" />
+            </svg>
+            <span class="sidebar-text text-sm whitespace-nowrap">User Management</span>
+            <span class="tooltip">Manage Users</span>
+        </a>
+        <?php endif; ?>
 
         <!-- Notifications Link (Top Level) -->
         <a href="<?= $base_path ?>notification/notification.php" id="nav-notifications" class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-lg <?= strpos($current_page, 'notification') !== false ? 'bg-white/10 text-white font-medium' : 'text-white/80 hover:text-white hover:bg-white/10' ?> transition-all group relative">

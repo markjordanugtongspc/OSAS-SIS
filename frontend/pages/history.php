@@ -539,6 +539,7 @@ try {
             const styles = `
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+                    @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
                     
                     @page {
                         size: A4;
@@ -566,65 +567,14 @@ try {
                         margin: 0 auto;
                         position: relative;
                         min-height: 100vh;
-                    }
-
-                    .print-header {
                         display: flex;
-                        justify-content: space-between;
-                        align-items: flex-end;
-                        margin-bottom: 2rem;
-                        padding-bottom: 1.5rem;
-                        border-bottom: 2px solid #800020;
+                        flex-direction: column;
+                        align-items: center; /* Ensure contents are centered */
                     }
 
-                    .header-left {
-                        display: flex;
-                        align-items: center;
-                        gap: 1rem;
-                    }
-
-                    .header-logo {
-                        width: 50px;
-                        height: 50px;
-                        object-fit: contain;
-                    }
-
-                    .header-text h1 {
-                        font-size: 16px;
-                        font-weight: 700;
-                        text-transform: uppercase;
-                        color: #111827;
-                        margin: 0;
-                        line-height: 1.2;
-                        letter-spacing: -0.01em;
-                    }
-
-                    .header-text p {
-                        font-size: 10px;
-                        color: #6b7280;
-                        text-transform: uppercase;
-                        letter-spacing: 0.05em;
-                        margin: 2px 0 0;
-                        font-weight: 500;
-                    }
-
-                    .report-meta {
-                        text-align: right;
-                    }
-
-                    .report-title {
-                        font-size: 14px;
-                        font-weight: 600;
-                        color: #800020;
-                        text-transform: uppercase;
-                        letter-spacing: 0.05em;
-                        margin-bottom: 4px;
-                    }
-
-                    .report-date {
-                        font-size: 10px;
-                        color: #9ca3af;
-                        font-weight: 500;
+                    .old-english {
+                        font-family: 'UnifrakturMaguntia', "Old English Text MT", "Engravers Old English BT", "Goudy Text MT", serif;
+                        font-weight: 400; /* UnifrakturMaguntia is 400 */
                     }
 
                     table {
@@ -710,6 +660,7 @@ try {
                         color: #d1d5db;
                         padding-top: 1rem;
                         border-top: 1px solid #f3f4f6;
+                        width: 100%;
                     }
                 </style>
             `;
@@ -722,21 +673,19 @@ try {
                     </head>
                     <body>
                         <div class="print-wrapper">
-                            <div class="print-header">
-                                <div class="header-left">
-                                    <img src="../../frontend/images/spc.png" alt="Logo" class="header-logo" />
-                                    <div class="header-text">
-                                        <h1>St. Peter's College</h1>
-                                        <p>Office of Student Affairs and Services</p>
-                                    </div>
-                                </div>
-                                <div class="report-meta">
-                                    <div class="report-title">Individual Record</div>
-                                    <div class="report-date">Generated on ${date}</div>
-                                </div>
+                            <div style="text-align: center; margin-bottom: 20px; width: 100%;">
+                                <img src="/OSAS-SIS/frontend/images/spc.png" alt="SPC Logo" style="width: 80px; height: auto; margin-bottom: 5px;">
+                                <h1 class="old-english" style="font-size: 28px; color: #800020; margin: 0; letter-spacing: 1px;">St. Peter's College</h1>
+                                <p style="margin: 5px 0 0; font-size: 12px; font-weight: 500; text-transform: uppercase; color: #374151;">Office of Student Affairs and Services • SIS</p>
+                            </div>
+                            <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #800020; padding-bottom: 10px; width: 100%;">
+                                <div style="font-size: 14px; font-weight: 700; color: #111827; text-transform: uppercase; letter-spacing: 0.05em;">Individual Record</div>
+                                <div style="font-size: 10px; color: #6b7280; margin-top: 2px;">Generated on ${date}</div>
                             </div>
 
-                            ${clone.innerHTML}
+                            <div style="width: 100%;">
+                                ${clone.innerHTML}
+                            </div>
 
                             <div class="footer">
                                 OSAS-SIS Borrow Management System &bull; Confidential
@@ -784,6 +733,7 @@ try {
             const styles = `
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+                    @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
 
                     @page {
                         size: A4 landscape; /* Landscape for better table fit */
@@ -810,64 +760,14 @@ try {
                         width: 100%;
                         margin: 0 auto;
                         position: relative;
-                    }
-
-                    /* Brand Header */
-                    .print-header {
                         display: flex;
-                        justify-content: space-between;
-                        align-items: flex-end;
-                        margin-bottom: 1.5rem;
-                        padding-bottom: 1rem;
-                        border-bottom: 2px solid #800020; /* System Burgundy */
+                        flex-direction: column;
+                        align-items: center; /* Center alignment */
                     }
 
-                    .header-left {
-                        display: flex;
-                        align-items: center;
-                        gap: 0.75rem;
-                    }
-
-                    .header-logo {
-                        width: 40px; /* Reduced from 45px */
-                        height: 40px;
-                        object-fit: contain;
-                    }
-
-                    .header-text h1 {
-                        font-size: 14px; /* Reduced to balance */
-                        font-weight: 800;
-                        text-transform: uppercase;
-                        color: #800020; /* System Burgundy */
-                        margin: 0;
-                        line-height: 1.1;
-                    }
-
-                    .header-text p {
-                        font-size: 9px;
-                        color: #4b5563;
-                        margin: 2px 0 0;
-                        font-weight: 500;
-                        text-transform: uppercase;
-                        letter-spacing: 0.05em;
-                    }
-
-                    .report-meta {
-                        text-align: right;
-                    }
-
-                    .report-title {
-                        font-size: 12px;
-                        font-weight: 700;
-                        color: #111827;
-                        text-transform: uppercase;
-                        letter-spacing: 0.05em;
-                        margin-bottom: 2px;
-                    }
-
-                    .report-date {
-                        font-size: 9px;
-                        color: #6b7280;
+                    .old-english {
+                         font-family: 'UnifrakturMaguntia', "Old English Text MT", "Engravers Old English BT", "Goudy Text MT", serif;
+                         font-weight: 400;
                     }
 
                     /* Table Design */
@@ -966,6 +866,7 @@ try {
                         padding-top: 1rem;
                         background: #fff;
                         border-top: 1px solid #f3f4f6;
+                        width: 100%;
                     }
                 </style>
             `;
@@ -978,21 +879,19 @@ try {
                     </head>
                     <body>
                         <div class="print-wrapper">
-                            <div class="print-header">
-                                <div class="header-left">
-                                    <img src="../../frontend/images/spc.png" alt="Logo" class="header-logo" />
-                                    <div class="header-text">
-                                        <h1>St. Peter's College</h1>
-                                        <p>Office of Student Affairs and Services • SIS</p>
-                                    </div>
-                                </div>
-                                <div class="report-meta">
-                                    <div class="report-title">History Report</div>
-                                    <div class="report-date">Generated on ${date}</div>
-                                </div>
+                            <div style="text-align: center; margin-bottom: 20px; width: 100%;">
+                                <img src="/OSAS-SIS/frontend/images/spc.png" alt="SPC Logo" style="width: 80px; height: auto; margin-bottom: 5px;">
+                                <h1 class="old-english" style="font-size: 28px; color: #800020; margin: 0; letter-spacing: 1px;">St. Peter's College</h1>
+                                <p style="margin: 5px 0 0; font-size: 12px; font-weight: 500; text-transform: uppercase; color: #374151;">Office of Student Affairs and Services • SIS</p>
+                            </div>
+                            <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #800020; padding-bottom: 10px; width: 100%;">
+                                <div style="font-size: 14px; font-weight: 700; color: #111827; text-transform: uppercase; letter-spacing: 0.05em;">History Report</div>
+                                <div style="font-size: 10px; color: #6b7280; margin-top: 2px;">Generated on ${date}</div>
                             </div>
                             
-                            ${clone.outerHTML}
+                            <div style="width: 100%;">
+                                ${clone.outerHTML}
+                            </div>
 
                             <div class="footer">
                                 System Generated Report &bull; OSAS-SIS &bull; Page <span class="page-number"></span>

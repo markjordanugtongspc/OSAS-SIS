@@ -2091,35 +2091,206 @@ function exportTableToPDF() {
     const cabinetName = document.getElementById('cabinetViewTitle')?.textContent || 'Cabinet Documents';
 
     // Create a new window for printing
-    const printWindow = window.open('', '', 'height=600,width=800');
+    const printWindow = window.open('', '', 'height=800,width=1100');
 
-    printWindow.document.write('<html><head><title>' + cabinetName + ' - Export</title>');
-    printWindow.document.write('<style>');
-    printWindow.document.write('body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; padding: 20px; color: #333; }');
-    printWindow.document.write('table { width: 100%; border-collapse: collapse; margin-top: 20px; }');
-    printWindow.document.write('th, td { border: 1px solid #e2e8f0; padding: 12px 8px; text-align: left; font-size: 12px; }');
-    printWindow.document.write('th { background-color: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 11px; }');
-    printWindow.document.write('h1 { color: #800000; font-size: 24px; margin-bottom: 5px; }');
-    printWindow.document.write('p.subtitle { color: #64748b; font-size: 14px; margin-top: 0; }');
-    printWindow.document.write('</style>');
-    printWindow.document.write('</head><body>');
+    // Use the same styles as the other updated reports
+    const styles = `
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
 
-    printWindow.document.write('<h1>' + cabinetName + '</h1>');
-    printWindow.document.write('<p class="subtitle">Generated on ' + new Date().toLocaleString() + '</p>');
+            @page {
+                size: A4 landscape;
+                margin: 1cm;
+            }
 
-    // Clone the table
-    const tableClone = itemsTable.cloneNode(true);
+            html, body {
+                padding: 0;
+                margin: 0;
+                height: 100%;
+            }
 
-    // Remove Actions column (last column)
-    const rows = tableClone.querySelectorAll('tr');
-    rows.forEach(row => {
-        if (row.cells.length > 0) {
-            row.deleteCell(-1);
-        }
-    });
+            body {
+                font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                color: #1f2937;
+                line-height: 1.4;
+                background: #fff;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                font-size: 10px;
+            }
 
-    printWindow.document.write(tableClone.outerHTML);
-    printWindow.document.write('</body></html>');
+            .print-wrapper {
+                width: 100%;
+                margin: 0 auto;
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                align-items: center; /* Center */
+            }
+
+            .old-english {
+                font-family: 'UnifrakturMaguntia', "Old English Text MT", "Engravers Old English BT", "Goudy Text MT", serif;
+                font-weight: 400;
+            }
+
+            /* Header */
+            .print-header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .header-logo {
+                width: 80px;
+                height: auto;
+                margin-bottom: 5px;
+            }
+
+            .header-text h1 {
+                font-family: 'UnifrakturMaguntia', "Old English Text MT", "Engravers Old English BT", "Goudy Text MT", serif;
+                font-size: 28px;
+                color: #800020;
+                margin: 0;
+                letter-spacing: 1px;
+                font-weight: 400;
+            }
+
+            .header-text p {
+                font-size: 12px;
+                font-weight: 500;
+                text-transform: uppercase;
+                color: #374151;
+                margin: 5px 0 0;
+            }
+
+            .report-meta {
+                text-align: center;
+                margin-bottom: 30px;
+                border-bottom: 2px solid #800020;
+                padding-bottom: 10px;
+            }
+
+            .report-title {
+                font-size: 14px;
+                font-weight: 700;
+                color: #111827;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                margin-bottom: 2px;
+            }
+
+            .report-date {
+                font-size: 10px;
+                color: #6b7280;
+            }
+
+            /* Table Design */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            thead {
+                display: table-header-group;
+            }
+
+            thead tr {
+                background: linear-gradient(to right, #800020, #5c0016) !important;
+                color: #ffffff !important;
+            }
+
+            th {
+                padding: 10px 12px;
+                text-align: left;
+                font-size: 9px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: #ffffff !important;
+                border-bottom: 1px solid #800020;
+                white-space: nowrap;
+            }
+
+            tbody tr {
+                border-bottom: 1px solid #f3f4f6;
+            }
+
+            tbody tr:nth-child(even) {
+                background-color: #f9fafb;
+            }
+
+            td {
+                padding: 8px 12px;
+                vertical-align: middle;
+                font-size: 10px;
+                color: #374151;
+            }
+
+            /* Actions column should be hidden */
+            td:last-child, th:last-child {
+                display: none;
+            }
+
+            /* Empty state */
+            tr#emptyStateRow td {
+                text-align: center;
+                padding: 2rem;
+                font-style: italic;
+                color: #9ca3af;
+            }
+
+            /* Footer */
+            .footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 8px;
+                color: #9ca3af;
+                padding-top: 1rem;
+                background: #fff;
+                border-top: 1px solid #f3f4f6;
+                width: 100%;
+            }
+        </style>
+    `;
+
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>${cabinetName} - Export</title>
+                ${styles}
+            </head>
+            <body>
+                <div class="print-wrapper">
+                    <div class="print-header">
+                        <img src="/OSAS-SIS/frontend/images/spc.png" alt="SPC Logo" class="header-logo">
+                        <div class="header-text">
+                            <h1>St. Peter's College</h1>
+                            <p>Office of Student Affairs and Services • SIS</p>
+                        </div>
+                    </div>
+                    
+                    <div class="report-meta">
+                        <div class="report-title">${cabinetName} Documents</div>
+                        <div class="report-date">Generated on ${new Date().toLocaleString()}</div>
+                    </div>
+                    
+                    <div style="width: 100%;">
+                        ${itemsTable.outerHTML}
+                    </div>
+
+                    <div class="footer">
+                        System Generated Report &bull; OSAS-SIS &bull; Document Management System
+                    </div>
+                </div>
+            </body>
+        </html>
+    `);
 
     printWindow.document.close();
     printWindow.focus();
@@ -2130,3 +2301,4 @@ function exportTableToPDF() {
         printWindow.close();
     }, 500);
 }
+
