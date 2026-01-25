@@ -316,13 +316,13 @@ For detailed user documentation and wiki, visit:
 
 ## License
 
-This project is developed for St. Peter's College (DSA-OSAS) as a school project.
+This project is developed for St. Peter's College (DSA-OSAS) as a OJT-In House Requirements.
 
 ---
 
 ## Contributing
 
-This is a school project. For contributions or questions, please contact the development team through the About page in the system.
+This is an OJT-In House requirements project. For contributions or questions, please contact the development team through the About page in the system.
 
 ---
 
@@ -335,4 +335,4 @@ For issues, questions, or support:
 
 ---
 
-**Last Updated:** 2024
+**Last Updated:** 2026
