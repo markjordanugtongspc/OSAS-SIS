@@ -167,6 +167,15 @@
         </a>
         <?php endif; ?>
 
+        <!-- About Link (Top Level) -->
+        <a href="<?= $base_path ?>pages/about.php" id="nav-about" class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-lg <?= $current_page == 'about.php' ? 'bg-white/10 text-white font-medium' : 'text-white/80 hover:text-white hover:bg-white/10' ?> transition-all group relative cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 flex-shrink-0">
+                <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097l-.502 3.988a1.54 1.54 0 001.898 1.898l3.988-.502A9.75 9.75 0 0012 21.75a9.723 9.723 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" />
+            </svg>
+            <span class="sidebar-text text-sm whitespace-nowrap">About</span>
+            <span class="tooltip">About Our Team</span>
+        </a>
+
         <!-- Notifications Link (Top Level) -->
         <a href="<?= $base_path ?>notification/notification.php" id="nav-notifications" class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-lg <?= strpos($current_page, 'notification') !== false ? 'bg-white/10 text-white font-medium' : 'text-white/80 hover:text-white hover:bg-white/10' ?> transition-all group relative">
             <div class="relative flex-shrink-0">
@@ -871,7 +880,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Pages that need full reload due to complex JavaScript interactions
             // Only keep history.php (and return.php if used) as full reload
-            const fullReloadPages = ['return.php', 'history.php'];
+            // Also include about.php to ensure proper initialization
+            const fullReloadPages = ['return.php', 'history.php', 'about.php'];
             const pageName = href.split('/').pop();
 
             // Always do a full page load for CMS routes to keep their layout consistent
