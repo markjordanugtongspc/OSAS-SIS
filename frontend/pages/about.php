@@ -56,66 +56,62 @@ $position = htmlspecialchars($_SESSION['position']);
                 <!-- Top 3 Developers Row -->
                 <div class="grid gap-8 lg:gap-12 sm:grid-cols-2 md:grid-cols-3 mb-8">
                     <!-- Jesper Ian Barilla - First (Highlighted) -->
-                    <div class="text-center text-gray-500 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] hover:-translate-y-1 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.1)] cursor-pointer relative">
-                        <div class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full">Lead</div>
+                    <div class="text-center text-gray-500 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] hover:-translate-y-1 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.1)] cursor-pointer relative border border-slate-200 bg-white rounded-xl p-8 m-2 flex flex-col justify-between h-full">
+                        <div class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full">Leader</div>
                         <div class="mx-auto mb-4 w-36 h-36 rounded-full overflow-hidden shadow-lg bg-gradient-to-br from-[#800020] to-[#5c0016] flex items-center justify-center">
                             <img src="../images/about/jesperianbarila.png" alt="Jesper Ian Barilla" class="w-full h-full object-cover">
                         </div>
-                        <h3 class="mb-1 text-2xl font-bold tracking-tight text-gray-900">
-                            Jesper Ian Barilla
-                        </h3>
-                        <p class="mb-2 text-gray-600 font-medium">Lead Full-Stack Developer</p>
-                        <p class="text-sm text-gray-500 mb-4">Built the entire Sports Equipment CRUD system, enhanced login frontend design, improved Storage Management with cabinet UI/UX enhancements, advanced search functionality, export features, and overall system improvements</p>
+                        <div class="flex flex-col items-center justify-center mb-2">
+                            <h3 class="text-2xl font-bold tracking-tight text-gray-900 mb-1">Jesper Ian Barilla</h3>
+                            <p class="text-gray-600 font-medium">Leader Full-Stack Developer</p>
+                        </div>
+                        <p class="text-sm text-gray-500 mb-4 text-justify">Built the entire Sports Equipment CRUD system, enhanced login frontend design, improved Storage Management with cabinet UI/UX enhancements, advanced search functionality, export features, and overall system improvements</p>
                         <ul class="flex justify-center mt-4 space-x-4">
-                            <li>
-                                <a href="https://www.facebook.com/jesper.ian.villacorte.barila/" class="text-[#39569c] hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="https://www.tiktok.com/@yansanity_23" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="https://github.com/yansanity1998" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" /></svg>
-                                </a>
+                            <li class="flex items-center justify-center w-full">
+                                <div class="flex flex-row items-center justify-center gap-4 w-full mt-4">
+                                    <a href="https://www.facebook.com/jesper.ian.villacorte.barila/" class="text-[#39569c] hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
+                                    </a>
+                                    <a href="https://www.tiktok.com/@yansanity_23" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                                    </a>
+                                    <a href="https://github.com/yansanity1998" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" /></svg>
+                                    </a>
+                                </div>
                             </li>
                         </ul>
                     </div>
                     
                     <!-- Casan Macaan -->
-                    <div class="text-center text-gray-500 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] hover:-translate-y-1 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.1)] cursor-pointer">
+                    <div class="text-center text-gray-500 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] hover:-translate-y-1 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.1)] cursor-pointer border border-slate-200 bg-white rounded-xl p-8 m-2 flex flex-col justify-between h-full">
                     <div class="mx-auto mb-4 w-36 h-36 rounded-full overflow-hidden shadow-lg bg-gradient-to-br from-[#800020] to-[#5c0016] flex items-center justify-center">
                             <img src="../images/about/casanmacaan.jpg" alt="Casan Macaan" class="w-full h-full object-cover">
                         </div>
-                        <h3 class="mb-1 text-2xl font-bold tracking-tight text-gray-900">
-                            Casan Macaan
-                        </h3>
-                        <p class="mb-2 text-gray-600 font-medium">Database Architect</p>
-                        <p class="text-sm text-gray-500 mb-4">Designed the entire database structure, ERD, table schemas, and system flow architecture</p>
+                        <div class="flex flex-col items-center justify-center mb-2">
+                            <h3 class="text-2xl font-bold tracking-tight text-gray-900 mb-1">Casan Macaan</h3>
+                            <p class="text-gray-600 font-medium">Database Architect</p>
+                        </div>
+                        <p class="text-sm text-gray-500 mb-4 text-justify">Designed the entire database structure, ERD, table schemas, and system flow architecture</p>
                         <ul class="flex justify-center mt-4 space-x-4">
-                            <li>
-                                <a href="https://www.facebook.com/casan.macaan" class="text-[#39569c] hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="https://github.com/Macaan2024" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" /></svg>
-                                </a>
+                            <li class="flex items-center justify-center w-full">
+                                <div class="flex flex-row items-center justify-center gap-4 w-full mt-4">
+                                    <a href="https://www.facebook.com/casan.macaan" class="text-[#39569c] hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
+                                    </a>
+                                    <a href="#" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                                    </a>
+                                    <a href="https://github.com/Macaan2024" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" /></svg>
+                                    </a>
+                                </div>
                             </li>
                         </ul>
                     </div>
                     
                     <!-- Mark Jordan Ugtong -->
-                    <div class="text-center text-gray-500 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] hover:-translate-y-1 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.1)] cursor-pointer">
+                    <div class="text-center text-gray-500 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] hover:-translate-y-1 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.1)] cursor-pointer border border-slate-200 bg-white rounded-xl p-8 m-2 flex flex-col justify-between h-full">
                         <div class="mx-auto mb-4 w-36 h-36 rounded-full overflow-hidden shadow-lg bg-gradient-to-br from-[#800020] to-[#5c0016] flex items-center justify-center">
                             <img src="../images/about/markjordanugtong.jpg" alt="Mark Jordan Ugtong" class="w-full h-full object-cover">
                         </div>
@@ -123,22 +119,20 @@ $position = htmlspecialchars($_SESSION['position']);
                             Mark Jordan Ugtong
                         </h3>
                         <p class="mb-2 text-gray-600 font-medium">Storage Management Foundation Developer</p>
-                        <p class="text-sm text-gray-500 mb-4">Created the login form backend, folder structure, database configuration, and Storage Management foundation including basic adding functionality, simple search, category system, and table structures</p>
+                        <p class="text-sm text-gray-500 mb-4 text-justify">Created the login form backend, folder structure, database configuration, and Storage Management foundation including basic adding functionality, simple search, category system, and table structures</p>
                         <ul class="flex justify-center mt-4 space-x-4">
-                            <li>
-                                <a href="https://www.facebook.com/analyn.polasko" class="text-[#39569c] hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="https://www.tiktok.com/@wizkhalifax_" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="https://github.com/markjordanugtongspc" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" /></svg>
-                                </a>
+                            <li class="flex items-center justify-center w-full">
+                                <div class="flex flex-row items-center justify-center gap-4 w-full mt-4">
+                                    <a href="https://www.facebook.com/analyn.polasko" class="text-[#39569c] hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
+                                    </a>
+                                    <a href="https://www.tiktok.com/@wizkhalifax_" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                                    </a>
+                                    <a href="https://github.com/markjordanugtongspc" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" /></svg>
+                                    </a>
+                                </div>
                             </li>
                         </ul>
                     </div>
@@ -146,7 +140,7 @@ $position = htmlspecialchars($_SESSION['position']);
                 
                 <!-- Bottom Row - Single Member (Centered) -->
                 <div class="flex justify-center">
-                    <div class="text-center text-gray-500 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] hover:-translate-y-1 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.1)] cursor-pointer max-w-sm">
+                    <div class="text-center text-gray-500 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] hover:-translate-y-1 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.1)] cursor-pointer max-w-sm border border-slate-200 bg-white rounded-xl p-8 m-2 flex flex-col justify-between h-full">
                         <!-- Stefen Harvey Alonzo -->
                         <div class="mx-auto mb-4 w-36 h-36 rounded-full overflow-hidden shadow-lg bg-gradient-to-br from-[#800020] to-[#5c0016] flex items-center justify-center">
                             <img src="../images/about/stefenharveyalonzo.jpg" alt="Stefen Harvey Alonzo" class="w-full h-full object-cover">
@@ -155,22 +149,20 @@ $position = htmlspecialchars($_SESSION['position']);
                             Stefen Harvey Alonzo
                         </h3>
                         <p class="mb-2 text-gray-600 font-medium">QA Tester & System Analyst</p>
-                        <p class="text-sm text-gray-500 mb-4">Tested the entire system, reported bugs, added items to the system, and contributed to CRUD operations</p>
+                        <p class="text-sm text-gray-500 mb-4 text-justify">Tested the entire system, reported bugs, added items to the system, and contributed to CRUD operations</p>
                         <ul class="flex justify-center mt-4 space-x-4">
-                            <li>
-                                <a href="https://www.facebook.com/walccc" class="text-[#39569c] hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" /></svg>
-                                </a>
+                            <li class="flex items-center justify-center w-full">
+                                <div class="flex flex-row items-center justify-center gap-4 w-full mt-4">
+                                    <a href="https://www.facebook.com/walccc" class="text-[#39569c] hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
+                                    </a>
+                                    <a href="#" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                                    </a>
+                                    <a href="#" class="text-gray-900 hover:text-gray-900 transition-colors cursor-pointer" target="_blank" rel="noopener noreferrer">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" /></svg>
+                                    </a>
+                                </div>
                             </li>
                         </ul>
                     </div>
